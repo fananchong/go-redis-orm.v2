@@ -34,7 +34,7 @@ func main() {
 		fmt.Println("start process file =", f.Name(), "...")
 
 		var jsonStr []byte
-		jsonStr, err = ioutil.ReadFile(f.Name())
+		jsonStr, err = ioutil.ReadFile(*inDir + "/" + f.Name())
 		if err != nil {
 			return err
 		}
