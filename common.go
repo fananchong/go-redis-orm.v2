@@ -1,13 +1,5 @@
 package go_redis_orm
 
-type RD_Base interface {
-	Key() string
-	Value() ([]byte, error)
-	Load(dbName string) error
-	Save(dbName string) error
-	Delete(dbName string) error
-}
-
 type IClient interface {
 	Do(commandName string, args ...interface{}) (reply interface{}, err error)
 }
