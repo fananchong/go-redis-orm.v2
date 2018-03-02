@@ -6,46 +6,49 @@
 package main
 
 import (
+	"errors"
+	"fmt"
 	go_redis_orm "github.com/fananchong/go-redis-orm.v2"
 	"github.com/garyburd/redigo/redis"
 )
 
 type RD_TestStruct1 struct {
-	Key  uint64
-	myb  bool
-	myf1 float32
-	myf2 float64
-	myi0 int
-	myi1 int8
-	myi2 int16
-	myi3 int32
-	myi4 int64
-	myi5 uint
-	myi6 uint8
-	myi7 uint16
-	myi8 uint32
-	myi9 uint64
-	mys1 string
-	mys2 []byte
+	Key  uint64  `redis:"Key"`
+	myb  bool    `redis:"myb"`
+	myf1 float32 `redis:"myf1"`
+	myf2 float64 `redis:"myf2"`
+	myi0 int     `redis:"myi0"`
+	myi1 int8    `redis:"myi1"`
+	myi2 int16   `redis:"myi2"`
+	myi3 int32   `redis:"myi3"`
+	myi4 int64   `redis:"myi4"`
+	myi5 uint    `redis:"myi5"`
+	myi6 uint8   `redis:"myi6"`
+	myi7 uint16  `redis:"myi7"`
+	myi8 uint32  `redis:"myi8"`
+	myi9 uint64  `redis:"myi9"`
+	mys1 string  `redis:"mys1"`
+	mys2 []byte  `redis:"mys2"`
 
 	__dirtyData map[string]interface{}
 	__isLoad    bool
 	__dbKey     string
 }
 
-func NewRD_TestStruct1() *RD_TestStruct1 {
+func NewRD_TestStruct1(key uint64) *RD_TestStruct1 {
 	return &RD_TestStruct1{
+		Key:         key,
+		__dbKey:     "TestStruct1:" + fmt.Sprintf("%d", key),
 		__dirtyData: make(map[string]interface{}),
 	}
 }
 
-func (this *RD_TestStruct1) Load(dbName string, key uint64) error {
+func (this *RD_TestStruct1) Load(dbName string) error {
 	if this.__isLoad == true {
 		return errors.New("alreay load!")
 	}
-	this.__dbKey = dbKey(key)
 	db := go_redis_orm.GetDB(dbName)
-	val, err := db.Do("HGETALL", this.__dbKey)
+	val, err := redis.Values(db.Do("HGETALL", this.__dbKey))
 	if err != nil {
 		return err
 	}
@@ -61,7 +64,7 @@ func (this *RD_TestStruct1) Save(dbName string) error {
 		return nil
 	}
 	db := go_redis_orm.GetDB(dbName)
-	if _, err := c.Do("HMSET", redis.Args{}.Add(this.__dbKey).AddFlat(this.__dirtyData)...); err != nil {
+	if _, err := db.Do("HMSET", redis.Args{}.Add(this.__dbKey).AddFlat(this.__dirtyData)...); err != nil {
 		return err
 	}
 	this.__dirtyData = make(map[string]interface{})
@@ -70,7 +73,7 @@ func (this *RD_TestStruct1) Save(dbName string) error {
 
 func (this *RD_TestStruct1) Delete(dbName string) error {
 	db := go_redis_orm.GetDB(dbName)
-	_, err := db.Do("DEL", dbKey(key))
+	_, err := db.Do("DEL", this.__dbKey)
 	return err
 }
 
@@ -136,4 +139,79 @@ func (this *RD_TestStruct1) GetMys1() string {
 
 func (this *RD_TestStruct1) GetMys2() []byte {
 	return this.mys2
+}
+
+func (this *RD_TestStruct1) SetMyb(value bool) {
+	this.myb = value
+	this.__dirtyData["myb"] = value
+}
+
+func (this *RD_TestStruct1) SetMyf1(value float32) {
+	this.myf1 = value
+	this.__dirtyData["myf1"] = value
+}
+
+func (this *RD_TestStruct1) SetMyf2(value float64) {
+	this.myf2 = value
+	this.__dirtyData["myf2"] = value
+}
+
+func (this *RD_TestStruct1) SetMyi0(value int) {
+	this.myi0 = value
+	this.__dirtyData["myi0"] = value
+}
+
+func (this *RD_TestStruct1) SetMyi1(value int8) {
+	this.myi1 = value
+	this.__dirtyData["myi1"] = value
+}
+
+func (this *RD_TestStruct1) SetMyi2(value int16) {
+	this.myi2 = value
+	this.__dirtyData["myi2"] = value
+}
+
+func (this *RD_TestStruct1) SetMyi3(value int32) {
+	this.myi3 = value
+	this.__dirtyData["myi3"] = value
+}
+
+func (this *RD_TestStruct1) SetMyi4(value int64) {
+	this.myi4 = value
+	this.__dirtyData["myi4"] = value
+}
+
+func (this *RD_TestStruct1) SetMyi5(value uint) {
+	this.myi5 = value
+	this.__dirtyData["myi5"] = value
+}
+
+func (this *RD_TestStruct1) SetMyi6(value uint8) {
+	this.myi6 = value
+	this.__dirtyData["myi6"] = value
+}
+
+func (this *RD_TestStruct1) SetMyi7(value uint16) {
+	this.myi7 = value
+	this.__dirtyData["myi7"] = value
+}
+
+func (this *RD_TestStruct1) SetMyi8(value uint32) {
+	this.myi8 = value
+	this.__dirtyData["myi8"] = value
+}
+
+func (this *RD_TestStruct1) SetMyi9(value uint64) {
+	this.myi9 = value
+	this.__dirtyData["myi9"] = value
+}
+
+func (this *RD_TestStruct1) SetMys1(value string) {
+	this.mys1 = value
+	this.__dirtyData["mys1"] = value
+}
+
+func (this *RD_TestStruct1) SetMys2(value []byte) {
+	this.mys2 = value
+	this.__dirtyData["mys2"] = value
 }

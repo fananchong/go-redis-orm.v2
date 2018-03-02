@@ -47,13 +47,21 @@ func doFile(js *simplejson.Json) error {
 
 func doType11() error {
 	template := template11
-	template = strings.Replace(template, "{{packagename}}", *packageName, 1)
+	template = strings.Replace(template, "{{packagename}}", *packageName, -1)
 	template = strings.Replace(template, "{{classname}}", className, -1)
+	template = strings.Replace(template, "{{rediskey}}", "`redis:\"Key\"`", -1)
 	template = strings.Replace(template, "{{key_type}}", keyType, -1)
-	template = strings.Replace(template, "{{fields_def}}", getFieldsDef(), 1)
-	template = strings.Replace(template, "{{func_get}}", getFuncGet(), 1)
-	template = strings.Replace(template, "{{func_set}}", "", 1)
-	template = strings.Replace(template, "{{func_dbkey}}", "", 1)
+	template = strings.Replace(template, "{{fields_def}}", getFieldsDef(), -1)
+	template = strings.Replace(template, "{{func_get}}", getFuncGet(), -1)
+	template = strings.Replace(template, "{{func_set}}", getFuncSet(), -1)
+
+	if strings.Contains(keyType, "int") {
+		template = strings.Replace(template, "{{func_dbkey}}", getFuncDbKeyInt(), -1)
+	} else if keyType == "string" {
+		template = strings.Replace(template, "{{func_dbkey}}", getFuncDbKeyStr(), -1)
+	} else {
+		return errors.New("key type error. type = " + keyType)
+	}
 
 	outpath := *outDir + "/" + className + ".go"
 	err := ioutil.WriteFile(outpath, []byte(template), 0666)
@@ -70,7 +78,7 @@ func getFieldsDef() string {
 	for _, k := range sortFields() {
 		v := fields[k].(string)
 		k2 := strings.ToLower(string(k[0])) + string(k[1:])
-		ret = ret + k2 + " " + v + "\n"
+		ret = ret + k2 + " " + v + " `redis:\"" + k2 + "\"`" + "\n"
 	}
 	return ret
 }
@@ -80,13 +88,41 @@ func getFuncGet() string {
 	for _, k := range sortFields() {
 		v := fields[k].(string)
 		template := getFuncString
-		template = strings.Replace(template, "{{classname}}", className, 1)
-		template = strings.Replace(template, "{{field_type}}", v, 1)
+		template = strings.Replace(template, "{{classname}}", className, -1)
+		template = strings.Replace(template, "{{field_type}}", v, -1)
 		template = strings.Replace(template, "{{field_name_upper}}", toUpper(k), -1)
-		template = strings.Replace(template, "{{field_name_lower}}", toLower(k), 1)
+		template = strings.Replace(template, "{{field_name_lower}}", toLower(k), -1)
 		ret = ret + template + "\n\n"
 	}
 	return ret
+}
+
+func getFuncSet() string {
+	var ret string = ""
+	for _, k := range sortFields() {
+		v := fields[k].(string)
+		template := setFuncString
+		template = strings.Replace(template, "{{classname}}", className, -1)
+		template = strings.Replace(template, "{{field_type}}", v, -1)
+		template = strings.Replace(template, "{{field_name_upper}}", toUpper(k), -1)
+		template = strings.Replace(template, "{{field_name_lower}}", toLower(k), -1)
+		ret = ret + template + "\n\n"
+	}
+	return ret
+}
+
+func getFuncDbKeyInt() string {
+	template := dbkeyFuncString_int
+	template = strings.Replace(template, "{{classname}}", className, -1)
+	template = strings.Replace(template, "{{key_type}}", keyType, -1)
+	return template
+}
+
+func getFuncDbKeyStr() string {
+	template := dbkeyFuncString_str
+	template = strings.Replace(template, "{{classname}}", className, -1)
+	template = strings.Replace(template, "{{key_type}}", keyType, -1)
+	return template
 }
 
 func doType1n() error {

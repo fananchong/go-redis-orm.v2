@@ -8,12 +8,14 @@ const template11 string = `/// -------------------------------------------------
 package {{packagename}}
 
 import (
+	"errors"
+	"fmt"
 	go_redis_orm "github.com/fananchong/go-redis-orm.v2"
 	"github.com/garyburd/redigo/redis"
 )
 
 type RD_{{classname}} struct {
-	Key {{key_type}}
+	Key {{key_type}} {{rediskey}}
 	{{fields_def}}
 
     __dirtyData map[string]interface{}
@@ -21,19 +23,20 @@ type RD_{{classname}} struct {
 	__dbKey string
 }
 
-func NewRD_{{classname}}() *RD_{{classname}} {
+func NewRD_{{classname}}(key {{key_type}}) *RD_{{classname}} {
 	return &RD_{{classname}} {
+		Key: key,
+		__dbKey: {{func_dbkey}},
 		__dirtyData: make(map[string]interface{}),
 	}
 }
 
-func (this *RD_{{classname}}) Load(dbName string, key {{key_type}}) error {
+func (this *RD_{{classname}}) Load(dbName string) error {
 	if this.__isLoad == true {
 		return errors.New("alreay load!")
 	}
-	this.__dbKey = dbKey(key)
 	db := go_redis_orm.GetDB(dbName)
-	val, err := db.Do("HGETALL", this.__dbKey)
+	val, err := redis.Values(db.Do("HGETALL", this.__dbKey))
 	if err != nil {
 		return err
 	}
@@ -49,7 +52,7 @@ func (this *RD_{{classname}}) Save(dbName string) error {
 		return nil
 	}
 	db := go_redis_orm.GetDB(dbName)
-	if _, err := c.Do("HMSET", redis.Args{}.Add(this.__dbKey).AddFlat(this.__dirtyData)...); err != nil {
+	if _, err := db.Do("HMSET", redis.Args{}.Add(this.__dbKey).AddFlat(this.__dirtyData)...); err != nil {
     	return err
 	}
 	this.__dirtyData = make(map[string]interface{})
@@ -58,7 +61,7 @@ func (this *RD_{{classname}}) Save(dbName string) error {
 
 func (this *RD_{{classname}}) Delete(dbName string) error {
 	db := go_redis_orm.GetDB(dbName)
-	_, err := db.Do("DEL", dbKey(key))
+	_, err := db.Do("DEL", this.__dbKey)
 	return err
 }
 
@@ -68,10 +71,17 @@ func (this *RD_{{classname}}) IsLoad() bool {
 
 {{func_get}}
 
-{{func_set}}
+{{func_set}}`
 
-{{func_dbkey}}`
-
-const getFuncString = `func (this *RD_{{classname}})Get{{field_name_upper}}() {{field_type}} {
+const getFuncString = `func (this *RD_{{classname}}) Get{{field_name_upper}}() {{field_type}} {
 	return this.{{field_name_lower}}
 }`
+
+const setFuncString = `func (this *RD_{{classname}}) Set{{field_name_upper}}(value {{field_type}}) {
+	this.{{field_name_lower}} = value
+	this.__dirtyData["{{field_name_lower}}"] = value
+}`
+
+const dbkeyFuncString_int = `"{{classname}}:" + fmt.Sprintf("%d", key)`
+
+const dbkeyFuncString_str = `"{{classname}}:" + key`
