@@ -121,3 +121,21 @@ func test1n() {
 git.exe submodule update --init -- "tools/build"
 build.bat
 ```
+
+## SetNewRedisHandler接口
+
+本库支持第3方redis客户端整合进本项目，通过调用go_redis_orm.SetNewRedisHandler函数
+
+需要实现go_redis_orm.IClient接口
+```go
+type IClient interface {
+	Do(commandName string, args ...interface{}) (reply interface{}, err error)
+}
+```
+
+例子参考：[default_redis_client.go](default_redis_client.go)
+
+
+## Redis单机、主从、哨兵、集群搭建
+
+详细参见：http://blog.csdn.net/u013272009/article/details/78513251
