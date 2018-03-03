@@ -8,8 +8,8 @@ package {{packagename}}
 
 import (
 	"errors"
-	"fmt"
-	"strconv"
+	{{fmt}}
+	{{strconv}}
 
 	go_redis_orm "github.com/fananchong/go-redis-orm.v2"
 	"github.com/garyburd/redigo/redis"
@@ -150,4 +150,4 @@ func (this *{{classname}}) IsLoad() bool {
 const convSubKeyFuncString_int = `tempUint64, err := strconv.ParseUint(temp, 10, 64)
 subKey := {{sub_key_type}}(tempUint64)`
 
-const convSubKeyFuncString_str = `subKey = temp`
+const convSubKeyFuncString_str = `subKey := temp`

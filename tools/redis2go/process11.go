@@ -62,8 +62,10 @@ func doType11() error {
 
 	if strings.Contains(keyType, "int") {
 		template = strings.Replace(template, "{{func_dbkey}}", getFuncDbKeyInt(), -1)
+		template = strings.Replace(template, "{{fmt}}", "\"fmt\"", -1)
 	} else if keyType == "string" {
 		template = strings.Replace(template, "{{func_dbkey}}", getFuncDbKeyStr(), -1)
+		template = strings.Replace(template, "{{fmt}}", "", -1)
 	} else {
 		return errors.New("key type error. type = " + keyType)
 	}

@@ -9,7 +9,7 @@ package {{packagename}}
 
 import (
 	"errors"
-	"fmt"
+	{{fmt}}
 	go_redis_orm "github.com/fananchong/go-redis-orm.v2"
 	"github.com/garyburd/redigo/redis"
 )

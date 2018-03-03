@@ -21,11 +21,18 @@ func doType1n() error {
 		return errors.New("subkey type error. type = " + sbuKeyType)
 	}
 	template = strings.Replace(template, "{{conv_subkey}}", getConvSubKey(), -1)
+	if strings.Contains(sbuKeyType, "int") {
+		template = strings.Replace(template, "{{strconv}}", "\"strconv\"", -1)
+	} else {
+		template = strings.Replace(template, "{{strconv}}", "", -1)
+	}
 
 	if strings.Contains(keyType, "int") {
 		template = strings.Replace(template, "{{func_dbkey}}", getFuncDbKeyInt(), -1)
+		template = strings.Replace(template, "{{fmt}}", "\"fmt\"", -1)
 	} else if keyType == "string" {
 		template = strings.Replace(template, "{{func_dbkey}}", getFuncDbKeyStr(), -1)
+		template = strings.Replace(template, "{{fmt}}", "", -1)
 	} else {
 		return errors.New("key type error. type = " + keyType)
 	}
@@ -62,10 +69,10 @@ func doType1n() error {
 
 func getConvSubKey() string {
 	var template = ""
-	if strings.Contains(keyType, "int") {
+	if strings.Contains(sbuKeyType, "int") {
 		template = convSubKeyFuncString_int
 		template = strings.Replace(template, "{{sub_key_type}}", sbuKeyType, -1)
-	} else if keyType == "string" {
+	} else if sbuKeyType == "string" {
 		template = convSubKeyFuncString_str
 	}
 	return template
