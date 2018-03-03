@@ -120,9 +120,10 @@ func (this *TestStruct1) Save() error {
 
 func (this *TestStruct1) Delete() error {
 	db := go_redis_orm.GetDB(this.__dbName)
-	_, err := db.Do("HDEL", this.__dbKey, "myb", "myf1", "myf2", "myi0", "myi1", "myi2", "myi3", "myi4", "myi5", "myi6", "myi7", "myi8", "myi9", "mys1", "mys2")
+	_, err := db.Do("DEL", this.__dbKey)
 	if err == nil {
 		this.__isLoad = false
+		this.__dirtyData = make(map[string]interface{})
 	}
 	return err
 }

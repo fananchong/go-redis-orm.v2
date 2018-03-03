@@ -2,6 +2,7 @@
   "name": "TestStruct2",
   "type": "1-n",
   "key": "int",
+  "subkey": "int",
   "fields": {
     "myb": "bool",
     "myi0": "int",

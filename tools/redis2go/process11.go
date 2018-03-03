@@ -2,7 +2,6 @@ package main
 
 import (
 	"errors"
-	"fmt"
 	"io/ioutil"
 	"os/exec"
 	"sort"
@@ -14,6 +13,7 @@ import (
 var (
 	className  string                 = ""
 	keyType    string                 = ""
+	sbuKeyType string                 = ""
 	structType string                 = ""
 	fields     map[string]interface{} = nil
 )
@@ -39,6 +39,10 @@ func doFile(js *simplejson.Json) error {
 	if structType == "1-1" {
 		return doType11()
 	} else if structType == "1-n" {
+		sbuKeyType, err = js.Get("subkey").String()
+		if err != nil {
+			return err
+		}
 		return doType1n()
 	} else {
 		return errors.New("type error. type = " + structType)
@@ -55,7 +59,6 @@ func doType11() error {
 	template = strings.Replace(template, "{{fields_init}}", getFieldsInit(), -1)
 	template = strings.Replace(template, "{{func_get}}", getFuncGet(), -1)
 	template = strings.Replace(template, "{{func_set}}", getFuncSet(), -1)
-	template = strings.Replace(template, "{{fields_list}}", getFieldsList(), -1)
 
 	if strings.Contains(keyType, "int") {
 		template = strings.Replace(template, "{{func_dbkey}}", getFuncDbKeyInt(), -1)
@@ -70,7 +73,6 @@ func doType11() error {
 	if err != nil {
 		return err
 	}
-	fmt.Println("start go fmt file ...")
 	err = exec.Command("gofmt", "-w", outpath).Run()
 	return err
 }
@@ -79,8 +81,7 @@ func getFieldsDef() string {
 	var ret string = ""
 	for _, k := range sortFields() {
 		v := fields[k].(string)
-		k2 := strings.ToLower(string(k[0])) + string(k[1:])
-		ret = ret + k2 + " " + v + "\n"
+		ret = ret + toLower(k) + " " + v + "\n"
 	}
 	return ret
 }
@@ -98,23 +99,10 @@ func getFieldsDefDB() string {
 func getFieldsInit() string {
 	var ret string = ""
 	for _, k := range sortFields() {
-		k2 := strings.ToLower(string(k[0])) + string(k[1:])
-		k3 := strings.ToUpper(string(k[0])) + string(k[1:])
 		if ret != "" {
 			ret = ret + "\n"
 		}
-		ret = ret + "this." + k2 + " = data." + k3
-	}
-	return ret
-}
-
-func getFieldsList() string {
-	var ret string = ""
-	for _, k := range sortFields() {
-		if ret != "" {
-			ret = ret + ", "
-		}
-		ret = ret + "\"" + strings.ToLower(k) + "\""
+		ret = ret + "this." + toLower(k) + " = data." + toUpper(k)
 	}
 	return ret
 }
@@ -160,10 +148,6 @@ func getFuncDbKeyStr() string {
 	template = strings.Replace(template, "{{classname}}", className, -1)
 	template = strings.Replace(template, "{{key_type}}", keyType, -1)
 	return template
-}
-
-func doType1n() error {
-	return nil
 }
 
 func toLower(s string) string {

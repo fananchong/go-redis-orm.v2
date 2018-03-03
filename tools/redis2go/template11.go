@@ -81,9 +81,10 @@ func (this *{{classname}}) Save() error {
 
 func (this *{{classname}}) Delete() error {
 	db := go_redis_orm.GetDB(this.__dbName)
-	_, err := db.Do("HDEL", this.__dbKey, {{fields_list}})
+	_, err := db.Do("DEL", this.__dbKey)
 	if err == nil {
 		this.__isLoad = false
+		this.__dirtyData = make(map[string]interface{})
 	}
 	return err
 }
