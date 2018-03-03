@@ -13,39 +13,42 @@ func main() {
 	go_redis_orm.SetNewRedisHandler(go_redis_orm.NewDefaultRedisClient)
 	go_redis_orm.CreateDB(dbName, []string{"192.168.1.12:16379"}, "", 0)
 
-	// key值为1的 TestStruct2 数据
-	data1 := NewRD_TestStruct1(1)
+	// key值为1的 TestStruct1 数据
+	data1 := NewRD_TestStruct1(dbName, 1)
 	data1.SetMyb(true)
 	data1.SetMyf1(1.5)
 	data1.SetMyi5(100)
 	data1.SetMys1("hello")
-	err := data1.Save(dbName)
+	data1.SetMys2([]byte("world"))
+	err := data1.Save()
 	if err != nil {
 		panic(err)
 	}
 
-	data2 := NewRD_TestStruct1(1)
-	err = data2.Load(dbName)
+	data2 := NewRD_TestStruct1(dbName, 1)
+	err = data2.Load()
 
 	if err == nil {
 		if data2.GetMyb() != true ||
 			data2.GetMyf1() != 1.5 ||
 			data2.GetMyi5() != 100 ||
-			data2.GetMys1() != "hello" {
-			panic("#2")
+			data2.GetMys1() != "hello" ||
+			string(data2.GetMys2()) != "world" {
+			panic("#1")
 		}
 	} else {
 		panic(err)
 	}
 
-	err = data2.Delete(dbName)
+	err = data2.Delete()
 	if err != nil {
 		panic(err)
 	}
 
-	err = data2.Load(dbName)
-	if data2.IsLoad() {
-		panic("#6")
+	var hasKey int
+	hasKey, err = data2.HasKey()
+	if hasKey != 0 {
+		panic("#2")
 	}
 
 	fmt.Println("OK")

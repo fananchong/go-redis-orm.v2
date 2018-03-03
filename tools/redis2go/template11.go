@@ -14,44 +14,64 @@ import (
 	"github.com/garyburd/redigo/redis"
 )
 
+
 type RD_{{classname}} struct {
-	Key {{key_type}} {{rediskey}}
+	Key {{key_type}}
 	{{fields_def}}
 
     __dirtyData map[string]interface{}
 	__isLoad bool
 	__dbKey string
+	__dbName string
 }
 
-func NewRD_{{classname}}(key {{key_type}}) *RD_{{classname}} {
+func NewRD_{{classname}}(dbName string, key {{key_type}}) *RD_{{classname}} {
 	return &RD_{{classname}} {
 		Key: key,
+		__dbName: dbName,
 		__dbKey: {{func_dbkey}},
 		__dirtyData: make(map[string]interface{}),
 	}
 }
 
-func (this *RD_{{classname}}) Load(dbName string) error {
+// 若访问数据库失败返回-1；若 key 存在返回 1 ，否则返回 0 。
+func (this *RD_{{classname}}) HasKey() (int, error) {
+	db := go_redis_orm.GetDB(this.__dbName)
+	val, err := redis.Int(db.Do("EXISTS", this.__dbKey))
+	if err != nil {
+		return -1, err
+	}
+	return val, nil
+}
+
+func (this *RD_{{classname}}) Load() error {
 	if this.__isLoad == true {
 		return errors.New("alreay load!")
 	}
-	db := go_redis_orm.GetDB(dbName)
+	db := go_redis_orm.GetDB(this.__dbName)
 	val, err := redis.Values(db.Do("HGETALL", this.__dbKey))
 	if err != nil {
 		return err
 	}
-	if err := redis.ScanStruct(val, this); err != nil {
+	if len(val) == 0 {
+		return errors.New("the key is not exist. key = " + this.__dbKey)
+	}
+	var data struct {
+		{{fields_def_db}}
+	}
+	if err := redis.ScanStruct(val, &data); err != nil {
 		return err
 	}
+	{{fields_init}}
 	this.__isLoad = true
 	return nil
 }
 
-func (this *RD_{{classname}}) Save(dbName string) error {
+func (this *RD_{{classname}}) Save() error {
 	if len(this.__dirtyData) == 0 {
 		return nil
 	}
-	db := go_redis_orm.GetDB(dbName)
+	db := go_redis_orm.GetDB(this.__dbName)
 	if _, err := db.Do("HMSET", redis.Args{}.Add(this.__dbKey).AddFlat(this.__dirtyData)...); err != nil {
     	return err
 	}
@@ -59,9 +79,12 @@ func (this *RD_{{classname}}) Save(dbName string) error {
 	return nil
 }
 
-func (this *RD_{{classname}}) Delete(dbName string) error {
-	db := go_redis_orm.GetDB(dbName)
-	_, err := db.Do("DEL", this.__dbKey)
+func (this *RD_{{classname}}) Delete() error {
+	db := go_redis_orm.GetDB(this.__dbName)
+	_, err := db.Do("HDEL", this.__dbKey, {{fields_list}})
+	if err == nil {
+		this.__isLoad = false
+	}
 	return err
 }
 
@@ -79,7 +102,7 @@ const getFuncString = `func (this *RD_{{classname}}) Get{{field_name_upper}}() {
 
 const setFuncString = `func (this *RD_{{classname}}) Set{{field_name_upper}}(value {{field_type}}) {
 	this.{{field_name_lower}} = value
-	this.__dirtyData["{{field_name_lower}}"] = value
+	this.__dirtyData["{{field_name_lower_all}}"] = value
 }`
 
 const dbkeyFuncString_int = `"{{classname}}:" + fmt.Sprintf("%d", key)`

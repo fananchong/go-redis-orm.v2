@@ -13,57 +13,104 @@ import (
 )
 
 type RD_TestStruct1 struct {
-	Key  uint64  `redis:"Key"`
-	myb  bool    `redis:"myb"`
-	myf1 float32 `redis:"myf1"`
-	myf2 float64 `redis:"myf2"`
-	myi0 int     `redis:"myi0"`
-	myi1 int8    `redis:"myi1"`
-	myi2 int16   `redis:"myi2"`
-	myi3 int32   `redis:"myi3"`
-	myi4 int64   `redis:"myi4"`
-	myi5 uint    `redis:"myi5"`
-	myi6 uint8   `redis:"myi6"`
-	myi7 uint16  `redis:"myi7"`
-	myi8 uint32  `redis:"myi8"`
-	myi9 uint64  `redis:"myi9"`
-	mys1 string  `redis:"mys1"`
-	mys2 []byte  `redis:"mys2"`
+	Key  uint64
+	myb  bool
+	myf1 float32
+	myf2 float64
+	myi0 int
+	myi1 int8
+	myi2 int16
+	myi3 int32
+	myi4 int64
+	myi5 uint
+	myi6 uint8
+	myi7 uint16
+	myi8 uint32
+	myi9 uint64
+	mys1 string
+	mys2 []byte
 
 	__dirtyData map[string]interface{}
 	__isLoad    bool
 	__dbKey     string
+	__dbName    string
 }
 
-func NewRD_TestStruct1(key uint64) *RD_TestStruct1 {
+func NewRD_TestStruct1(dbName string, key uint64) *RD_TestStruct1 {
 	return &RD_TestStruct1{
 		Key:         key,
+		__dbName:    dbName,
 		__dbKey:     "TestStruct1:" + fmt.Sprintf("%d", key),
 		__dirtyData: make(map[string]interface{}),
 	}
 }
 
-func (this *RD_TestStruct1) Load(dbName string) error {
+// 若访问数据库失败返回-1；若 key 存在返回 1 ，否则返回 0 。
+func (this *RD_TestStruct1) HasKey() (int, error) {
+	db := go_redis_orm.GetDB(this.__dbName)
+	val, err := redis.Int(db.Do("EXISTS", this.__dbKey))
+	if err != nil {
+		return -1, err
+	}
+	return val, nil
+}
+
+func (this *RD_TestStruct1) Load() error {
 	if this.__isLoad == true {
 		return errors.New("alreay load!")
 	}
-	db := go_redis_orm.GetDB(dbName)
+	db := go_redis_orm.GetDB(this.__dbName)
 	val, err := redis.Values(db.Do("HGETALL", this.__dbKey))
 	if err != nil {
 		return err
 	}
-	if err := redis.ScanStruct(val, this); err != nil {
+	if len(val) == 0 {
+		return errors.New("the key is not exist. key = " + this.__dbKey)
+	}
+	var data struct {
+		Myb  bool    `redis:"myb"`
+		Myf1 float32 `redis:"myf1"`
+		Myf2 float64 `redis:"myf2"`
+		Myi0 int     `redis:"myi0"`
+		Myi1 int8    `redis:"myi1"`
+		Myi2 int16   `redis:"myi2"`
+		Myi3 int32   `redis:"myi3"`
+		Myi4 int64   `redis:"myi4"`
+		Myi5 uint    `redis:"myi5"`
+		Myi6 uint8   `redis:"myi6"`
+		Myi7 uint16  `redis:"myi7"`
+		Myi8 uint32  `redis:"myi8"`
+		Myi9 uint64  `redis:"myi9"`
+		Mys1 string  `redis:"mys1"`
+		Mys2 []byte  `redis:"mys2"`
+	}
+	if err := redis.ScanStruct(val, &data); err != nil {
 		return err
 	}
+	this.myb = data.Myb
+	this.myf1 = data.Myf1
+	this.myf2 = data.Myf2
+	this.myi0 = data.Myi0
+	this.myi1 = data.Myi1
+	this.myi2 = data.Myi2
+	this.myi3 = data.Myi3
+	this.myi4 = data.Myi4
+	this.myi5 = data.Myi5
+	this.myi6 = data.Myi6
+	this.myi7 = data.Myi7
+	this.myi8 = data.Myi8
+	this.myi9 = data.Myi9
+	this.mys1 = data.Mys1
+	this.mys2 = data.Mys2
 	this.__isLoad = true
 	return nil
 }
 
-func (this *RD_TestStruct1) Save(dbName string) error {
+func (this *RD_TestStruct1) Save() error {
 	if len(this.__dirtyData) == 0 {
 		return nil
 	}
-	db := go_redis_orm.GetDB(dbName)
+	db := go_redis_orm.GetDB(this.__dbName)
 	if _, err := db.Do("HMSET", redis.Args{}.Add(this.__dbKey).AddFlat(this.__dirtyData)...); err != nil {
 		return err
 	}
@@ -71,9 +118,12 @@ func (this *RD_TestStruct1) Save(dbName string) error {
 	return nil
 }
 
-func (this *RD_TestStruct1) Delete(dbName string) error {
-	db := go_redis_orm.GetDB(dbName)
-	_, err := db.Do("DEL", this.__dbKey)
+func (this *RD_TestStruct1) Delete() error {
+	db := go_redis_orm.GetDB(this.__dbName)
+	_, err := db.Do("HDEL", this.__dbKey, "myb", "myf1", "myf2", "myi0", "myi1", "myi2", "myi3", "myi4", "myi5", "myi6", "myi7", "myi8", "myi9", "mys1", "mys2")
+	if err == nil {
+		this.__isLoad = false
+	}
 	return err
 }
 
