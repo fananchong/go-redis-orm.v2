@@ -15,7 +15,7 @@ import (
 )
 
 
-type RD_{{classname}} struct {
+type {{classname}} struct {
 	Key {{key_type}}
 	{{fields_def}}
 
@@ -25,8 +25,8 @@ type RD_{{classname}} struct {
 	__dbName string
 }
 
-func NewRD_{{classname}}(dbName string, key {{key_type}}) *RD_{{classname}} {
-	return &RD_{{classname}} {
+func New{{classname}}(dbName string, key {{key_type}}) *{{classname}} {
+	return &{{classname}} {
 		Key: key,
 		__dbName: dbName,
 		__dbKey: {{func_dbkey}},
@@ -35,7 +35,7 @@ func NewRD_{{classname}}(dbName string, key {{key_type}}) *RD_{{classname}} {
 }
 
 // 若访问数据库失败返回-1；若 key 存在返回 1 ，否则返回 0 。
-func (this *RD_{{classname}}) HasKey() (int, error) {
+func (this *{{classname}}) HasKey() (int, error) {
 	db := go_redis_orm.GetDB(this.__dbName)
 	val, err := redis.Int(db.Do("EXISTS", this.__dbKey))
 	if err != nil {
@@ -44,7 +44,7 @@ func (this *RD_{{classname}}) HasKey() (int, error) {
 	return val, nil
 }
 
-func (this *RD_{{classname}}) Load() error {
+func (this *{{classname}}) Load() error {
 	if this.__isLoad == true {
 		return errors.New("alreay load!")
 	}
@@ -67,7 +67,7 @@ func (this *RD_{{classname}}) Load() error {
 	return nil
 }
 
-func (this *RD_{{classname}}) Save() error {
+func (this *{{classname}}) Save() error {
 	if len(this.__dirtyData) == 0 {
 		return nil
 	}
@@ -79,7 +79,7 @@ func (this *RD_{{classname}}) Save() error {
 	return nil
 }
 
-func (this *RD_{{classname}}) Delete() error {
+func (this *{{classname}}) Delete() error {
 	db := go_redis_orm.GetDB(this.__dbName)
 	_, err := db.Do("HDEL", this.__dbKey, {{fields_list}})
 	if err == nil {
@@ -88,7 +88,7 @@ func (this *RD_{{classname}}) Delete() error {
 	return err
 }
 
-func (this *RD_{{classname}}) IsLoad() bool {
+func (this *{{classname}}) IsLoad() bool {
 	return this.__isLoad
 }
 
@@ -96,11 +96,11 @@ func (this *RD_{{classname}}) IsLoad() bool {
 
 {{func_set}}`
 
-const getFuncString = `func (this *RD_{{classname}}) Get{{field_name_upper}}() {{field_type}} {
+const getFuncString = `func (this *{{classname}}) Get{{field_name_upper}}() {{field_type}} {
 	return this.{{field_name_lower}}
 }`
 
-const setFuncString = `func (this *RD_{{classname}}) Set{{field_name_upper}}(value {{field_type}}) {
+const setFuncString = `func (this *{{classname}}) Set{{field_name_upper}}(value {{field_type}}) {
 	this.{{field_name_lower}} = value
 	this.__dirtyData["{{field_name_lower_all}}"] = value
 }`

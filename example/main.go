@@ -14,7 +14,7 @@ func main() {
 	go_redis_orm.CreateDB(dbName, []string{"192.168.1.12:16379"}, "", 0)
 
 	// key值为1的 TestStruct1 数据
-	data1 := NewRD_TestStruct1(dbName, 1)
+	data1 := NewTestStruct1(dbName, 1)
 	data1.SetMyb(true)
 	data1.SetMyf1(1.5)
 	data1.SetMyi5(100)
@@ -25,7 +25,7 @@ func main() {
 		panic(err)
 	}
 
-	data2 := NewRD_TestStruct1(dbName, 1)
+	data2 := NewTestStruct1(dbName, 1)
 	err = data2.Load()
 
 	if err == nil {

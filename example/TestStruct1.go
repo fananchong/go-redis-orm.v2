@@ -12,7 +12,7 @@ import (
 	"github.com/garyburd/redigo/redis"
 )
 
-type RD_TestStruct1 struct {
+type TestStruct1 struct {
 	Key  uint64
 	myb  bool
 	myf1 float32
@@ -36,8 +36,8 @@ type RD_TestStruct1 struct {
 	__dbName    string
 }
 
-func NewRD_TestStruct1(dbName string, key uint64) *RD_TestStruct1 {
-	return &RD_TestStruct1{
+func NewTestStruct1(dbName string, key uint64) *TestStruct1 {
+	return &TestStruct1{
 		Key:         key,
 		__dbName:    dbName,
 		__dbKey:     "TestStruct1:" + fmt.Sprintf("%d", key),
@@ -46,7 +46,7 @@ func NewRD_TestStruct1(dbName string, key uint64) *RD_TestStruct1 {
 }
 
 // 若访问数据库失败返回-1；若 key 存在返回 1 ，否则返回 0 。
-func (this *RD_TestStruct1) HasKey() (int, error) {
+func (this *TestStruct1) HasKey() (int, error) {
 	db := go_redis_orm.GetDB(this.__dbName)
 	val, err := redis.Int(db.Do("EXISTS", this.__dbKey))
 	if err != nil {
@@ -55,7 +55,7 @@ func (this *RD_TestStruct1) HasKey() (int, error) {
 	return val, nil
 }
 
-func (this *RD_TestStruct1) Load() error {
+func (this *TestStruct1) Load() error {
 	if this.__isLoad == true {
 		return errors.New("alreay load!")
 	}
@@ -106,7 +106,7 @@ func (this *RD_TestStruct1) Load() error {
 	return nil
 }
 
-func (this *RD_TestStruct1) Save() error {
+func (this *TestStruct1) Save() error {
 	if len(this.__dirtyData) == 0 {
 		return nil
 	}
@@ -118,7 +118,7 @@ func (this *RD_TestStruct1) Save() error {
 	return nil
 }
 
-func (this *RD_TestStruct1) Delete() error {
+func (this *TestStruct1) Delete() error {
 	db := go_redis_orm.GetDB(this.__dbName)
 	_, err := db.Do("HDEL", this.__dbKey, "myb", "myf1", "myf2", "myi0", "myi1", "myi2", "myi3", "myi4", "myi5", "myi6", "myi7", "myi8", "myi9", "mys1", "mys2")
 	if err == nil {
@@ -127,141 +127,141 @@ func (this *RD_TestStruct1) Delete() error {
 	return err
 }
 
-func (this *RD_TestStruct1) IsLoad() bool {
+func (this *TestStruct1) IsLoad() bool {
 	return this.__isLoad
 }
 
-func (this *RD_TestStruct1) GetMyb() bool {
+func (this *TestStruct1) GetMyb() bool {
 	return this.myb
 }
 
-func (this *RD_TestStruct1) GetMyf1() float32 {
+func (this *TestStruct1) GetMyf1() float32 {
 	return this.myf1
 }
 
-func (this *RD_TestStruct1) GetMyf2() float64 {
+func (this *TestStruct1) GetMyf2() float64 {
 	return this.myf2
 }
 
-func (this *RD_TestStruct1) GetMyi0() int {
+func (this *TestStruct1) GetMyi0() int {
 	return this.myi0
 }
 
-func (this *RD_TestStruct1) GetMyi1() int8 {
+func (this *TestStruct1) GetMyi1() int8 {
 	return this.myi1
 }
 
-func (this *RD_TestStruct1) GetMyi2() int16 {
+func (this *TestStruct1) GetMyi2() int16 {
 	return this.myi2
 }
 
-func (this *RD_TestStruct1) GetMyi3() int32 {
+func (this *TestStruct1) GetMyi3() int32 {
 	return this.myi3
 }
 
-func (this *RD_TestStruct1) GetMyi4() int64 {
+func (this *TestStruct1) GetMyi4() int64 {
 	return this.myi4
 }
 
-func (this *RD_TestStruct1) GetMyi5() uint {
+func (this *TestStruct1) GetMyi5() uint {
 	return this.myi5
 }
 
-func (this *RD_TestStruct1) GetMyi6() uint8 {
+func (this *TestStruct1) GetMyi6() uint8 {
 	return this.myi6
 }
 
-func (this *RD_TestStruct1) GetMyi7() uint16 {
+func (this *TestStruct1) GetMyi7() uint16 {
 	return this.myi7
 }
 
-func (this *RD_TestStruct1) GetMyi8() uint32 {
+func (this *TestStruct1) GetMyi8() uint32 {
 	return this.myi8
 }
 
-func (this *RD_TestStruct1) GetMyi9() uint64 {
+func (this *TestStruct1) GetMyi9() uint64 {
 	return this.myi9
 }
 
-func (this *RD_TestStruct1) GetMys1() string {
+func (this *TestStruct1) GetMys1() string {
 	return this.mys1
 }
 
-func (this *RD_TestStruct1) GetMys2() []byte {
+func (this *TestStruct1) GetMys2() []byte {
 	return this.mys2
 }
 
-func (this *RD_TestStruct1) SetMyb(value bool) {
+func (this *TestStruct1) SetMyb(value bool) {
 	this.myb = value
 	this.__dirtyData["myb"] = value
 }
 
-func (this *RD_TestStruct1) SetMyf1(value float32) {
+func (this *TestStruct1) SetMyf1(value float32) {
 	this.myf1 = value
 	this.__dirtyData["myf1"] = value
 }
 
-func (this *RD_TestStruct1) SetMyf2(value float64) {
+func (this *TestStruct1) SetMyf2(value float64) {
 	this.myf2 = value
 	this.__dirtyData["myf2"] = value
 }
 
-func (this *RD_TestStruct1) SetMyi0(value int) {
+func (this *TestStruct1) SetMyi0(value int) {
 	this.myi0 = value
 	this.__dirtyData["myi0"] = value
 }
 
-func (this *RD_TestStruct1) SetMyi1(value int8) {
+func (this *TestStruct1) SetMyi1(value int8) {
 	this.myi1 = value
 	this.__dirtyData["myi1"] = value
 }
 
-func (this *RD_TestStruct1) SetMyi2(value int16) {
+func (this *TestStruct1) SetMyi2(value int16) {
 	this.myi2 = value
 	this.__dirtyData["myi2"] = value
 }
 
-func (this *RD_TestStruct1) SetMyi3(value int32) {
+func (this *TestStruct1) SetMyi3(value int32) {
 	this.myi3 = value
 	this.__dirtyData["myi3"] = value
 }
 
-func (this *RD_TestStruct1) SetMyi4(value int64) {
+func (this *TestStruct1) SetMyi4(value int64) {
 	this.myi4 = value
 	this.__dirtyData["myi4"] = value
 }
 
-func (this *RD_TestStruct1) SetMyi5(value uint) {
+func (this *TestStruct1) SetMyi5(value uint) {
 	this.myi5 = value
 	this.__dirtyData["myi5"] = value
 }
 
-func (this *RD_TestStruct1) SetMyi6(value uint8) {
+func (this *TestStruct1) SetMyi6(value uint8) {
 	this.myi6 = value
 	this.__dirtyData["myi6"] = value
 }
 
-func (this *RD_TestStruct1) SetMyi7(value uint16) {
+func (this *TestStruct1) SetMyi7(value uint16) {
 	this.myi7 = value
 	this.__dirtyData["myi7"] = value
 }
 
-func (this *RD_TestStruct1) SetMyi8(value uint32) {
+func (this *TestStruct1) SetMyi8(value uint32) {
 	this.myi8 = value
 	this.__dirtyData["myi8"] = value
 }
 
-func (this *RD_TestStruct1) SetMyi9(value uint64) {
+func (this *TestStruct1) SetMyi9(value uint64) {
 	this.myi9 = value
 	this.__dirtyData["myi9"] = value
 }
 
-func (this *RD_TestStruct1) SetMys1(value string) {
+func (this *TestStruct1) SetMys1(value string) {
 	this.mys1 = value
 	this.__dirtyData["mys1"] = value
 }
 
-func (this *RD_TestStruct1) SetMys2(value []byte) {
+func (this *TestStruct1) SetMys2(value []byte) {
 	this.mys2 = value
 	this.__dirtyData["mys2"] = value
 }
