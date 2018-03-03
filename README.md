@@ -108,7 +108,7 @@ func test1n() {
 
   1. 定义json文件
 
-    格式参考：example/redis_def/*.json
+     格式参考：example/redis_def/*.json
 
   1. 使用release/redis2go.exe生成go文件
 
