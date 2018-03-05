@@ -1,5 +1,7 @@
 package go_redis_orm
 
+import "errors"
+
 type IClient interface {
 	Do(commandName string, args ...interface{}) (reply interface{}, err error)
 }
@@ -17,3 +19,5 @@ func CreateDB(dbName string, addrs []string, password string, dbindex int) {
 func GetDB(dbName string) IClient {
 	return g_redismgr.Get(dbName)
 }
+
+var ERR_ISNOT_EXIST_KEY = errors.New("is not exist thi key")

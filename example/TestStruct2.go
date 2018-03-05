@@ -52,7 +52,7 @@ func (this *TestStruct2) Load() error {
 		return err
 	}
 	if len(val) == 0 {
-		return errors.New("the key is not exist. key = " + this.__dbKey)
+		return go_redis_orm.ERR_ISNOT_EXIST_KEY
 	}
 	for i := 0; i < len(val); i += 2 {
 		temp := string(val[i].([]byte))
