@@ -34,6 +34,7 @@ type TestStruct1 struct {
 	__isLoad    bool
 	__dbKey     string
 	__dbName    string
+	__expire    uint
 }
 
 func NewTestStruct1(dbName string, key uint64) *TestStruct1 {
@@ -114,6 +115,11 @@ func (this *TestStruct1) Save() error {
 	if _, err := db.Do("HMSET", redis.Args{}.Add(this.__dbKey).AddFlat(this.__dirtyData)...); err != nil {
 		return err
 	}
+	if this.__expire != 0 {
+		if _, err := db.Do("EXPIRE", this.__dbKey, this.__expire); err != nil {
+			return err
+		}
+	}
 	this.__dirtyData = make(map[string]interface{})
 	return nil
 }
@@ -130,6 +136,10 @@ func (this *TestStruct1) Delete() error {
 
 func (this *TestStruct1) IsLoad() bool {
 	return this.__isLoad
+}
+
+func (this *TestStruct1) Expire(v uint) {
+	this.__expire = v
 }
 
 func (this *TestStruct1) GetMyb() bool {

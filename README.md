@@ -185,7 +185,3 @@ type IClient interface {
 ## Redis单机、主从、哨兵、集群搭建
 
 详细参见：http://blog.csdn.net/u013272009/article/details/78513251
-
-## TODO
-
-  - 增加配置-设置KEY过期时间

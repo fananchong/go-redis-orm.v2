@@ -14,12 +14,14 @@ import (
 )
 
 type TestStruct2 struct {
-	Key         int
-	values      map[int]*TestStruct2Item
+	Key    int
+	values map[int]*TestStruct2Item
+
 	__dirtyData map[int]int
 	__isLoad    bool
 	__dbKey     string
 	__dbName    string
+	__expire    uint
 }
 
 func NewTestStruct2(dbName string, key int) *TestStruct2 {
@@ -90,6 +92,11 @@ func (this *TestStruct2) Save() error {
 	if _, err := db.Do("HMSET", redis.Args{}.Add(this.__dbKey).AddFlat(tempData)...); err != nil {
 		return err
 	}
+	if this.__expire != 0 {
+		if _, err := db.Do("EXPIRE", this.__dbKey, this.__expire); err != nil {
+			return err
+		}
+	}
 	this.__dirtyData = make(map[int]int)
 	return nil
 }
@@ -143,4 +150,8 @@ func (this *TestStruct2) GetItems() []*TestStruct2Item {
 
 func (this *TestStruct2) IsLoad() bool {
 	return this.__isLoad
+}
+
+func (this *TestStruct2) Expire(v uint) {
+	this.__expire = v
 }

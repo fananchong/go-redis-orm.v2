@@ -23,6 +23,7 @@ type {{classname}} struct {
 	__isLoad bool
 	__dbKey string
 	__dbName string
+	__expire uint
 }
 
 func New{{classname}}(dbName string, key {{key_type}}) *{{classname}} {
@@ -75,6 +76,11 @@ func (this *{{classname}}) Save() error {
 	if _, err := db.Do("HMSET", redis.Args{}.Add(this.__dbKey).AddFlat(this.__dirtyData)...); err != nil {
     	return err
 	}
+	if this.__expire != 0 {
+		if _, err := db.Do("EXPIRE", this.__dbKey, this.__expire); err != nil {
+			return err
+		}
+	}
 	this.__dirtyData = make(map[string]interface{})
 	return nil
 }
@@ -91,6 +97,10 @@ func (this *{{classname}}) Delete() error {
 
 func (this *{{classname}}) IsLoad() bool {
 	return this.__isLoad
+}
+
+func (this *{{classname}}) Expire(v uint) {
+	this.__expire = v
 }
 
 {{func_get}}
