@@ -1,14 +1,15 @@
 {
 	"ImportPath": "github.com/fananchong/go-redis-orm.v2",
-	"GoVersion": "go1.9",
-	"GodepVersion": "v79",
+	"GoVersion": "go1.10",
+	"GodepVersion": "v80",
 	"Packages": [
 		"./..."
 	],
 	"Deps": [
 		{
-			"ImportPath": "github.com/FZambia/go-sentinel",
-			"Rev": "76bd05e8e22f9f8f5e1dd6d3a85b7951da7cce57"
+			"ImportPath": "github.com/FZambia/sentinel",
+			"Comment": "v1.0.0",
+			"Rev": "e69a8dc549bb0aabdc63fbfd9e8bfe971a368153"
 		},
 		{
 			"ImportPath": "github.com/bitly/go-simplejson",
@@ -17,21 +18,32 @@
 		},
 		{
 			"ImportPath": "github.com/fananchong/goredis",
-			"Rev": "396b10f41c4db0ba5405120032d3a1b5c74054f0"
+			"Rev": "2fb04ef83a080dc3068b8284ee0dd0ea211a9205"
 		},
 		{
 			"ImportPath": "github.com/garyburd/redigo/internal",
-			"Comment": "v1.4.0",
-			"Rev": "d1ed5c67e5794de818ea85e6b522fda02623a484"
+			"Comment": "v1.6.0-3-g569eae5",
+			"Rev": "569eae59ada904ea8db7a225c2b47165af08735a"
 		},
 		{
 			"ImportPath": "github.com/garyburd/redigo/redis",
-			"Comment": "v1.4.0",
-			"Rev": "d1ed5c67e5794de818ea85e6b522fda02623a484"
+			"Comment": "v1.6.0-3-g569eae5",
+			"Rev": "569eae59ada904ea8db7a225c2b47165af08735a"
+		},
+		{
+			"ImportPath": "github.com/gomodule/redigo/internal",
+			"Comment": "v2.0.0-5-g2cd21d9",
+			"Rev": "2cd21d9966bf7ff9ae091419744f0b3fb0fecace"
+		},
+		{
+			"ImportPath": "github.com/gomodule/redigo/redis",
+			"Comment": "v2.0.0-5-g2cd21d9",
+			"Rev": "2cd21d9966bf7ff9ae091419744f0b3fb0fecace"
 		},
 		{
 			"ImportPath": "github.com/mna/redisc",
-			"Rev": "a2dd2591e7f2f97ade1e05bb26947a26d2040f14"
+			"Comment": "v1.1.2",
+			"Rev": "1d42445fe2abe34af11aa88bc438225d98aee7b6"
 		}
 	]
 }
