@@ -10,7 +10,7 @@ import (
 	"strconv"
 
 	go_redis_orm "github.com/fananchong/go-redis-orm.v2"
-	"github.com/garyburd/redigo/redis"
+	"github.com/gomodule/redigo/redis"
 )
 
 type TestStruct2 struct {
