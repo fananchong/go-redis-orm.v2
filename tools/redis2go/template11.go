@@ -10,6 +10,7 @@ package {{packagename}}
 import (
 	"errors"
 	{{fmt}}
+	{{fmt_ctructgo}}
 	go_redis_orm "github.com/fananchong/go-redis-orm.v2"
 	"github.com/gomodule/redigo/redis"
 )
@@ -19,7 +20,8 @@ type {{classname}} struct {
 	Key {{key_type}}
 	{{fields_def}}
 
-    __dirtyData map[string]interface{}
+	__dirtyData map[string]interface{}
+	__dirtyDataForStructFiled map[string]interface{}
 	__isLoad bool
 	__dbKey string
 	__dbName string
@@ -32,6 +34,7 @@ func New{{classname}}(dbName string, key {{key_type}}) *{{classname}} {
 		__dbName: dbName,
 		__dbKey: {{func_dbkey}},
 		__dirtyData: make(map[string]interface{}),
+		__dirtyDataForStructFiled: make(map[string]interface{}),
 	}
 }
 
@@ -69,12 +72,15 @@ func (this *{{classname}}) Load() error {
 }
 
 func (this *{{classname}}) Save() error {
-	if len(this.__dirtyData) == 0 {
+	if len(this.__dirtyData) == 0 && len(this.__dirtyDataForStructFiled) == 0 {
 		return nil
+	}
+	for k,_ :=range(this.__dirtyDataForStructFiled) {
+		{{fields_save}}
 	}
 	db := go_redis_orm.GetDB(this.__dbName)
 	if _, err := db.Do("HMSET", redis.Args{}.Add(this.__dbKey).AddFlat(this.__dirtyData)...); err != nil {
-    	return err
+		return err
 	}
 	if this.__expire != 0 {
 		if _, err := db.Do("EXPIRE", this.__dbKey, this.__expire); err != nil {
@@ -82,6 +88,7 @@ func (this *{{classname}}) Save() error {
 		}
 	}
 	this.__dirtyData = make(map[string]interface{})
+	this.__dirtyDataForStructFiled = make(map[string]interface{})
 	return nil
 }
 
@@ -91,6 +98,7 @@ func (this *{{classname}}) Delete() error {
 	if err == nil {
 		this.__isLoad = false
 		this.__dirtyData = make(map[string]interface{})
+		this.__dirtyDataForStructFiled = make(map[string]interface{})
 	}
 	return err
 }
@@ -114,6 +122,21 @@ const getFuncString = `func (this *{{classname}}) Get{{field_name_upper}}() {{fi
 const setFuncString = `func (this *{{classname}}) Set{{field_name_upper}}(value {{field_type}}) {
 	this.{{field_name_lower}} = value
 	this.__dirtyData["{{field_name_lower_all}}"] = value
+}`
+
+const getFuncStringForStructFiled = `func (this *{{classname}}) Get{{field_name_upper}}(mutable bool) *{{field_type}} {
+	if mutable {
+		this.__dirtyDataForStructFiled["{{field_name_lower_all}}"] = nil
+	}
+	return &this.{{field_name_lower}}
+}`
+
+const getFuncStringSave = `if k == "{{field_name_lower_all}}" {
+	data, err := cstruct.Marshal(&this.{{field_name_lower}})
+	if err != nil {
+		return err
+	}
+	this.__dirtyData["{{field_name_lower_all}}"] = data
 }`
 
 const dbkeyFuncString_int = `"{{classname}}:" + fmt.Sprintf("%d", key)`

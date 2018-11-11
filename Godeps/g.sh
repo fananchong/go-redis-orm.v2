@@ -3,8 +3,7 @@
 set -ex
 
 
-# update
-./legacy.sh
+#./legacy.sh
 
 cp -f ./Godeps.json.template ./Godeps.json
 cd ..

@@ -17,6 +17,8 @@
     "myf1": "float32",
     "myf2": "float64",
     "mys1": "string",
-    "mys2": "[]byte"
+    "mys2": "[]byte",
+    "myst1": "StrcutXX",
+    "myst2": "StrcutYY"
   }
 }

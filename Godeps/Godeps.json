@@ -8,13 +8,17 @@
 	"Deps": [
 		{
 			"ImportPath": "github.com/FZambia/sentinel",
-			"Comment": "v1.0.0",
-			"Rev": "e69a8dc549bb0aabdc63fbfd9e8bfe971a368153"
+			"Comment": "v1.0.0-1-g52eb513",
+			"Rev": "52eb51343b45ab047f25b864563d93ed16e28c6c"
 		},
 		{
 			"ImportPath": "github.com/bitly/go-simplejson",
 			"Comment": "v0.5.0-8-g0c96595",
 			"Rev": "0c965951289cce37dec52ad1f34200fefc816777"
+		},
+		{
+			"ImportPath": "github.com/fananchong/cstruct-go",
+			"Rev": "73ebcf5e2442335d2d5f2dae78943171095fbb7d"
 		},
 		{
 			"ImportPath": "github.com/fananchong/goredis",
