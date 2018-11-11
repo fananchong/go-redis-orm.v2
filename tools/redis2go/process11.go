@@ -28,6 +28,9 @@ func doFile(js *simplejson.Json) error {
 	if err != nil {
 		return err
 	}
+	if keyType == "uint" || keyType == "int" {
+		return errors.New("no support type: uint or int. please use uint8 int8 uint16 int16 ... etc")
+	}
 	structType, err = js.Get("type").String()
 	if err != nil {
 		return err
@@ -36,12 +39,18 @@ func doFile(js *simplejson.Json) error {
 	if err != nil {
 		return err
 	}
+	if err := checkFieldType(); err != nil {
+		return err
+	}
 	if structType == "1-1" {
 		return doType11()
 	} else if structType == "1-n" {
 		sbuKeyType, err = js.Get("subkey").String()
 		if err != nil {
 			return err
+		}
+		if sbuKeyType == "uint" || sbuKeyType == "int" {
+			return errors.New("no support type: uint or int. please use uint8 int8 uint16 int16 ... etc")
 		}
 		return doType1n()
 	} else {
@@ -54,7 +63,7 @@ func doType11() error {
 	template = strings.Replace(template, "{{packagename}}", *packageName, -1)
 	template = strings.Replace(template, "{{classname}}", className, -1)
 	template = strings.Replace(template, "{{key_type}}", keyType, -1)
-	template = strings.Replace(template, "{{fields_def}}", getFieldsDef(), -1)
+	template = strings.Replace(template, "{{fields_def}}", getFieldsDef(false), -1)
 	template = strings.Replace(template, "{{fields_def_db}}", getFieldsDefDB(), -1)
 	template = strings.Replace(template, "{{fields_init}}", getFieldsInit(), -1)
 	template = strings.Replace(template, "{{func_get}}", getFuncGet(), -1)
@@ -122,11 +131,25 @@ func hasStructField() bool {
 	return has
 }
 
-func getFieldsDef() string {
+func checkFieldType() error {
+	for _, k := range sortFields() {
+		v := fields[k].(string)
+		if v == "uint" || v == "int" {
+			return errors.New("no support type: uint or int. please use uint8 int8 uint16 int16 ... etc")
+		}
+	}
+	return nil
+}
+
+func getFieldsDef(up bool) string {
 	var ret string = ""
 	for _, k := range sortFields() {
 		v := fields[k].(string)
-		ret = ret + toLower(k) + " " + v + "\n"
+		if up == false {
+			ret = ret + toLower(k) + " " + v + "\n"
+		} else {
+			ret = ret + toUpper(k) + " " + v + "\n"
+		}
 	}
 	return ret
 }

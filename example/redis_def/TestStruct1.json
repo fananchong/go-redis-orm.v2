@@ -4,12 +4,10 @@
   "key": "uint64",
   "fields": {
     "myb": "bool",
-    "myi0": "int",
     "myi1": "int8",
     "myi2": "int16",
     "myi3": "int32",
     "myi4": "int64",
-    "myi5": "uint",
     "myi6": "uint8",
     "myi7": "uint16",
     "myi8": "uint32",

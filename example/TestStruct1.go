@@ -18,12 +18,10 @@ type TestStruct1 struct {
 	myb   bool
 	myf1  float32
 	myf2  float64
-	myi0  int
 	myi1  int8
 	myi2  int16
 	myi3  int32
 	myi4  int64
-	myi5  uint
 	myi6  uint8
 	myi7  uint16
 	myi8  uint32
@@ -77,12 +75,10 @@ func (this *TestStruct1) Load() error {
 		Myb   bool    `redis:"myb"`
 		Myf1  float32 `redis:"myf1"`
 		Myf2  float64 `redis:"myf2"`
-		Myi0  int     `redis:"myi0"`
 		Myi1  int8    `redis:"myi1"`
 		Myi2  int16   `redis:"myi2"`
 		Myi3  int32   `redis:"myi3"`
 		Myi4  int64   `redis:"myi4"`
-		Myi5  uint    `redis:"myi5"`
 		Myi6  uint8   `redis:"myi6"`
 		Myi7  uint16  `redis:"myi7"`
 		Myi8  uint32  `redis:"myi8"`
@@ -98,12 +94,10 @@ func (this *TestStruct1) Load() error {
 	this.myb = data.Myb
 	this.myf1 = data.Myf1
 	this.myf2 = data.Myf2
-	this.myi0 = data.Myi0
 	this.myi1 = data.Myi1
 	this.myi2 = data.Myi2
 	this.myi3 = data.Myi3
 	this.myi4 = data.Myi4
-	this.myi5 = data.Myi5
 	this.myi6 = data.Myi6
 	this.myi7 = data.Myi7
 	this.myi8 = data.Myi8
@@ -187,10 +181,6 @@ func (this *TestStruct1) GetMyf2() float64 {
 	return this.myf2
 }
 
-func (this *TestStruct1) GetMyi0() int {
-	return this.myi0
-}
-
 func (this *TestStruct1) GetMyi1() int8 {
 	return this.myi1
 }
@@ -205,10 +195,6 @@ func (this *TestStruct1) GetMyi3() int32 {
 
 func (this *TestStruct1) GetMyi4() int64 {
 	return this.myi4
-}
-
-func (this *TestStruct1) GetMyi5() uint {
-	return this.myi5
 }
 
 func (this *TestStruct1) GetMyi6() uint8 {
@@ -264,11 +250,6 @@ func (this *TestStruct1) SetMyf2(value float64) {
 	this.__dirtyData["myf2"] = value
 }
 
-func (this *TestStruct1) SetMyi0(value int) {
-	this.myi0 = value
-	this.__dirtyData["myi0"] = value
-}
-
 func (this *TestStruct1) SetMyi1(value int8) {
 	this.myi1 = value
 	this.__dirtyData["myi1"] = value
@@ -287,11 +268,6 @@ func (this *TestStruct1) SetMyi3(value int32) {
 func (this *TestStruct1) SetMyi4(value int64) {
 	this.myi4 = value
 	this.__dirtyData["myi4"] = value
-}
-
-func (this *TestStruct1) SetMyi5(value uint) {
-	this.myi5 = value
-	this.__dirtyData["myi5"] = value
 }
 
 func (this *TestStruct1) SetMyi6(value uint8) {

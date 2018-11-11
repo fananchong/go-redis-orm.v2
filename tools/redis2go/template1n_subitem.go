@@ -6,12 +6,17 @@ const template1n_subitem string = `/// -----------------------------------------
 /// -------------------------------------------------------------------------------
 package {{packagename}}
 
-import "encoding/json"
+import (
+	cstruct "github.com/fananchong/cstruct-go"
+)
+
+type {{classname}}ItemData struct {
+	{{fields_def}}
+}
 
 type {{classname}}Item struct {
 	SubKey {{sub_key_type}}
-	{{fields_def}}
-
+	__data {{classname}}ItemData
 	__root *{{classname}}
 }
 
@@ -27,31 +32,33 @@ func New{{classname}}Item(subKey {{sub_key_type}}, root *{{classname}}) *{{class
 {{func_set1n}}
 
 func (this *{{classname}}Item) Unmarshal(data []byte) error {
-	var temp struct {
-		{{fields_def_json}}
-	}
-	err := json.Unmarshal(data, &temp)
-	if err != nil {
+	if err := cstruct.Unmarshal(data, &this.__data); err != nil {
 		return err
 	}
-	{{set_this1n}}
 	return nil
 }
 
 func (this *{{classname}}Item) Marshal() ([]byte, error) {
-	var temp struct {
-		{{fields_def_json}}
+	data, err := cstruct.Marshal(&this.__data)
+	if err != nil {
+		return nil, err
 	}
-	{{set_temp1n}}
-	return json.Marshal(temp)
+	return data, nil
 }
 `
 
 const get1nFuncString = `func (this *{{classname}}Item) Get{{field_name_upper}}() {{field_type}} {
-	return this.{{field_name_lower}}
+	return this.__data.{{field_name_upper}}
 }`
 
 const set1nFuncString = `func (this *{{classname}}Item) Set{{field_name_upper}}(value {{field_type}}) {
-	this.{{field_name_lower}} = value
+	this.__data.{{field_name_upper}} = value
 	this.__root.__dirtyData[this.SubKey] = 1
+}`
+
+const get1nFuncStringForStructFiled = `func (this *{{classname}}Item) Get{{field_name_upper}}(mutable bool) *{{field_type}} {
+	if mutable {
+		this.__root.__dirtyData[this.SubKey] = 1
+	}
+	return &this.__data.{{field_name_upper}}
 }`

@@ -16,7 +16,6 @@ func test11() {
 	data1 := NewTestStruct1(dbName, 1)
 	data1.SetMyb(true)
 	data1.SetMyf1(1.5)
-	data1.SetMyi5(100)
 	data1.SetMys1("hello")
 	data1.SetMys2([]byte("world"))
 
@@ -40,7 +39,6 @@ func test11() {
 	if err == nil {
 		if data2.GetMyb() != true ||
 			data2.GetMyf1() != 1.5 ||
-			data2.GetMyi5() != 100 ||
 			data2.GetMys1() != "hello" ||
 			string(data2.GetMys2()) != "world" {
 			panic("#1")
@@ -76,14 +74,25 @@ func test1n() {
 	dbName := "db2"
 
 	go_redis_orm.SetNewRedisHandler(go_redis_orm.NewDefaultRedisClient)
-	go_redis_orm.CreateDB(dbName, []string{"192.168.1.12:16379"}, "", 0)
+	go_redis_orm.CreateDB(dbName, []string{"127.0.0.1:6379"}, "", 0)
 
 	data1 := NewTestStruct2(dbName, 8)
 	item1 := data1.NewItem(1)
 	item1.SetMyf2(99.9)
+
+	myst1 := item1.GetMyst1(true)
+	myst1.A = 100
+	myst1.B = 1000.99
+
+	myst2 := item1.GetMyst2(true)
+	myst2.C = append(myst2.C, 1)
+	myst2.C = append(myst2.C, 2)
+	myst2.C = append(myst2.C, 3)
+
 	item2 := data1.NewItem(2)
 	item2.SetMys1("hello")
 	item2.SetMys2([]byte("world"))
+	item2.SetMyi3(10000)
 	err := data1.Save()
 	if err != nil {
 		panic(err)
@@ -118,4 +127,3 @@ func main() {
 	test11()
 	test1n()
 }
-

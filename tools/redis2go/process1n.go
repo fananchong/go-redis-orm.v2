@@ -15,7 +15,7 @@ func doType1n() error {
 	template = strings.Replace(template, "{{classname}}", className, -1)
 	template = strings.Replace(template, "{{key_type}}", keyType, -1)
 	template = strings.Replace(template, "{{sub_key_type}}", sbuKeyType, -1)
-	template = strings.Replace(template, "{{fields_def}}", getFieldsDef(), -1)
+	template = strings.Replace(template, "{{fields_def}}", getFieldsDef(false), -1)
 
 	if !strings.Contains(sbuKeyType, "int") && sbuKeyType != "string" {
 		return errors.New("subkey type error. type = " + sbuKeyType)
@@ -52,12 +52,9 @@ func doType1n() error {
 	template = strings.Replace(template, "{{packagename}}", *packageName, -1)
 	template = strings.Replace(template, "{{classname}}", className, -1)
 	template = strings.Replace(template, "{{sub_key_type}}", sbuKeyType, -1)
-	template = strings.Replace(template, "{{fields_def}}", getFieldsDef(), -1)
+	template = strings.Replace(template, "{{fields_def}}", getFieldsDef(true), -1)
 	template = strings.Replace(template, "{{func_get1n}}", getFuncGet1n(), -1)
 	template = strings.Replace(template, "{{func_set1n}}", getFuncSet1n(), -1)
-	template = strings.Replace(template, "{{fields_def_json}}", getFieldsDefJson(), -1)
-	template = strings.Replace(template, "{{set_this1n}}", getSetThis1n(), -1)
-	template = strings.Replace(template, "{{set_temp1n}}", getSetTemp1n(), -1)
 	outpath = *outDir + "/" + className + "Item.go"
 	err = ioutil.WriteFile(outpath, []byte(template), 0666)
 	if err != nil {
@@ -83,6 +80,10 @@ func getFuncGet1n() string {
 	for _, k := range sortFields() {
 		v := fields[k].(string)
 		template := get1nFuncString
+		if isBaseType(v) == false {
+			template = get1nFuncStringForStructFiled
+			template = strings.Replace(template, "{{field_name_lower_all}}", strings.ToLower(k), -1)
+		}
 		template = strings.Replace(template, "{{classname}}", className, -1)
 		template = strings.Replace(template, "{{field_type}}", v, -1)
 		template = strings.Replace(template, "{{field_name_upper}}", toUpper(k), -1)
@@ -96,43 +97,15 @@ func getFuncSet1n() string {
 	var ret string = ""
 	for _, k := range sortFields() {
 		v := fields[k].(string)
+		if isBaseType(v) == false {
+			continue
+		}
 		template := set1nFuncString
 		template = strings.Replace(template, "{{classname}}", className, -1)
 		template = strings.Replace(template, "{{field_type}}", v, -1)
 		template = strings.Replace(template, "{{field_name_upper}}", toUpper(k), -1)
 		template = strings.Replace(template, "{{field_name_lower}}", toLower(k), -1)
 		ret = ret + template + "\n\n"
-	}
-	return ret
-}
-
-func getFieldsDefJson() string {
-	var ret string = ""
-	for _, k := range sortFields() {
-		v := fields[k].(string)
-		ret = ret + toUpper(k) + " " + v + " `json:\"" + strings.ToLower(k) + "\"`" + "\n"
-	}
-	return ret
-}
-
-func getSetThis1n() string {
-	var ret string = ""
-	for _, k := range sortFields() {
-		if ret != "" {
-			ret = ret + "\n"
-		}
-		ret = ret + "this." + toLower(k) + " = temp." + toUpper(k)
-	}
-	return ret
-}
-
-func getSetTemp1n() string {
-	var ret string = ""
-	for _, k := range sortFields() {
-		if ret != "" {
-			ret = ret + "\n"
-		}
-		ret = ret + "temp." + toUpper(k) + " = this." + toLower(k)
 	}
 	return ret
 }
