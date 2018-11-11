@@ -4,12 +4,10 @@
   "key": "uint64",
   "fields": {
     "myb": "bool",
-    "myi0": "int",
     "myi1": "int8",
     "myi2": "int16",
     "myi3": "int32",
     "myi4": "int64",
-    "myi5": "uint",
     "myi6": "uint8",
     "myi7": "uint16",
     "myi8": "uint32",
@@ -17,6 +15,8 @@
     "myf1": "float32",
     "myf2": "float64",
     "mys1": "string",
-    "mys2": "[]byte"
+    "mys2": "[]byte",
+    "myst1": "StrcutXX",
+    "myst2": "StrcutYY"
   }
 }

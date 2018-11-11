@@ -14,23 +14,23 @@ import (
 )
 
 type TestStruct2 struct {
-	Key    int
-	values map[int]*TestStruct2Item
+	Key    int32
+	values map[int32]*TestStruct2Item
 
-	__dirtyData map[int]int
+	__dirtyData map[int32]int
 	__isLoad    bool
 	__dbKey     string
 	__dbName    string
 	__expire    uint
 }
 
-func NewTestStruct2(dbName string, key int) *TestStruct2 {
+func NewTestStruct2(dbName string, key int32) *TestStruct2 {
 	return &TestStruct2{
 		Key:         key,
-		values:      make(map[int]*TestStruct2Item),
+		values:      make(map[int32]*TestStruct2Item),
 		__dbName:    dbName,
 		__dbKey:     "TestStruct2:" + fmt.Sprintf("%d", key),
-		__dirtyData: make(map[int]int),
+		__dirtyData: make(map[int32]int),
 	}
 }
 
@@ -59,7 +59,7 @@ func (this *TestStruct2) Load() error {
 	for i := 0; i < len(val); i += 2 {
 		temp := string(val[i].([]byte))
 		tempUint64, err := strconv.ParseUint(temp, 10, 64)
-		subKey := int(tempUint64)
+		subKey := int32(tempUint64)
 		if err != nil {
 			return err
 		}
@@ -78,7 +78,7 @@ func (this *TestStruct2) Save() error {
 	if len(this.__dirtyData) == 0 {
 		return nil
 	}
-	tempData := make(map[int][]byte)
+	tempData := make(map[int32][]byte)
 	for k, _ := range this.__dirtyData {
 		if item, ok := this.values[k]; ok {
 			var err error
@@ -97,7 +97,7 @@ func (this *TestStruct2) Save() error {
 			return err
 		}
 	}
-	this.__dirtyData = make(map[int]int)
+	this.__dirtyData = make(map[int32]int)
 	return nil
 }
 
@@ -106,19 +106,19 @@ func (this *TestStruct2) Delete() error {
 	_, err := db.Do("DEL", this.__dbKey)
 	if err == nil {
 		this.__isLoad = false
-		this.__dirtyData = make(map[int]int)
+		this.__dirtyData = make(map[int32]int)
 	}
 	return err
 }
 
-func (this *TestStruct2) NewItem(subKey int) *TestStruct2Item {
+func (this *TestStruct2) NewItem(subKey int32) *TestStruct2Item {
 	item := NewTestStruct2Item(subKey, this)
 	this.values[subKey] = item
 	this.__dirtyData[subKey] = 1
 	return item
 }
 
-func (this *TestStruct2) DeleteItem(subKey int) error {
+func (this *TestStruct2) DeleteItem(subKey int32) error {
 	if _, ok := this.values[subKey]; ok {
 		db := go_redis_orm.GetDB(this.__dbName)
 		_, err := db.Do("HDEL", this.__dbKey, subKey)
@@ -133,7 +133,7 @@ func (this *TestStruct2) DeleteItem(subKey int) error {
 	return nil
 }
 
-func (this *TestStruct2) GetItem(subKey int) *TestStruct2Item {
+func (this *TestStruct2) GetItem(subKey int32) *TestStruct2Item {
 	if item, ok := this.values[subKey]; ok {
 		return item
 	}

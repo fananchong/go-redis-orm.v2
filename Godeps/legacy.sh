@@ -11,6 +11,7 @@ go get -u -d github.com/gomodule/redigo/redis
 go get -u -d github.com/FZambia/sentinel
 go get -u -d github.com/mna/redisc
 go get -u -d github.com/fananchong/goredis
+go get -u -d github.com/fananchong/cstruct-go
 
 unset GOPATH
 
