@@ -197,3 +197,9 @@ type IClient interface {
 ## Redis单机、主从、哨兵、集群搭建
 
 详细参见：<http://blog.csdn.net/u013272009/article/details/78513251>
+
+
+## TODO
+- 可以自定义`序列化 struct 字段的`方法，比如使用 json 、 protobuf 以及其他
+
+
