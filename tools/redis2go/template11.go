@@ -76,6 +76,7 @@ func (this *{{classname}}) Save() error {
 		return nil
 	}
 	for k,_ :=range(this.__dirtyDataForStructFiled) {
+		_ = k
 		{{fields_save}}
 	}
 	db := go_redis_orm.GetDB(this.__dbName)
