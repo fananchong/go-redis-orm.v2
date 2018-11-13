@@ -200,6 +200,7 @@ type IClient interface {
 
 
 ## TODO
+- 增加 Clone() 、 ClearChange() 等方法
 - 可以自定义`序列化 struct 字段的`方法，比如使用 json 、 protobuf 以及其他
 - 可以自定义 save 、 del 方法，方便用户可以网络投递给数据代理服务器
 
