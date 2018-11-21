@@ -3,13 +3,13 @@
 set -ex
 
 
-CURDIR=$PWD
+SRC_DIR=/go/src/github.com/fananchong/go-redis-orm.v2
 
-docker run --rm -e GOBIN=/go/bin/ -v "$PWD"/bin:/go/bin/ -v "$PWD":/go/src/github.com/fananchong/go-redis-orm.v2 -w /go/src/github.com/fananchong/go-redis-orm.v2 golang go install ./tools/...
+docker run --rm -e GOBIN=/go/bin/ -v $PWD/bin:/go/bin/ -v $PWD:$SRC_DIR -w $SRC_DIR golang go install ./tools/...
 
 ./bin/redis2go --input_dir=./example/redis_def --output_dir=./example --package=main
 
-docker run --rm -e GOBIN=/go/bin/ -v "$PWD"/bin:/go/bin/ -v "$PWD":/go/src/github.com/fananchong/go-redis-orm.v2 -w /go/src/github.com/fananchong/go-redis-orm.v2 golang go install ./example/...
+docker run --rm -e GOBIN=/go/bin/ -v $PWD/bin:/go/bin/ -v $PWD:$SRC_DIR -w $SRC_DIR golang go install ./example/...
 
 
 if [ "$1" = "publish" ]; then

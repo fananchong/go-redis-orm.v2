@@ -44,6 +44,9 @@ func doType1n() error {
 	}
 	err = exec.Command("gofmt", "-w", outpath).Run()
 	if err != nil {
+		err = exec.Command("/usr/local/go/bin/gofmt", "-w", outpath).Run()
+	}
+	if err != nil {
 		return err
 	}
 
@@ -61,6 +64,9 @@ func doType1n() error {
 		return err
 	}
 	err = exec.Command("gofmt", "-w", outpath).Run()
+	if err != nil {
+		err = exec.Command("/usr/local/go/bin/gofmt", "-w", outpath).Run()
+	}
 	return err
 }
 
