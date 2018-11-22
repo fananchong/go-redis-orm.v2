@@ -33,6 +33,10 @@ func test11() {
 		panic(err)
 	}
 
+	data1.SetMyi8(123456)
+	dirtyData, _ := data1.DirtyData()
+	data1.Save2(dirtyData)
+
 	data2 := NewTestStruct1(dbName, 1)
 	err = data2.Load()
 
@@ -98,6 +102,10 @@ func test1n() {
 		panic(err)
 	}
 
+	item2.SetMyi8(654321)
+	dirtyData, _ := data1.DirtyData()
+	data1.Save2(dirtyData)
+
 	data2 := NewTestStruct2(dbName, 8)
 	err = data2.Load()
 	if err != nil {
@@ -127,3 +135,4 @@ func main() {
 	test11()
 	test1n()
 }
+

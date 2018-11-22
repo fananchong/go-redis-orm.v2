@@ -148,6 +148,36 @@ func (this *TestStruct2) GetItems() []*TestStruct2Item {
 	return ret
 }
 
+func (this *TestStruct2) DirtyData() (map[int32][]byte, error) {
+	data := make(map[int32][]byte)
+	for k, _ := range this.__dirtyData {
+		if item, ok := this.values[k]; ok {
+			var err error
+			data[k], err = item.Marshal()
+			if err != nil {
+				return nil, err
+			}
+		}
+	}
+	return data, nil
+}
+
+func (this *TestStruct2) Save2(dirtyData map[int32][]byte) error {
+	if len(dirtyData) == 0 {
+		return nil
+	}
+	db := go_redis_orm.GetDB(this.__dbName)
+	if _, err := db.Do("HMSET", redis.Args{}.Add(this.__dbKey).AddFlat(dirtyData)...); err != nil {
+		return err
+	}
+	if this.__expire != 0 {
+		if _, err := db.Do("EXPIRE", this.__dbKey, this.__expire); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 func (this *TestStruct2) IsLoad() bool {
 	return this.__isLoad
 }

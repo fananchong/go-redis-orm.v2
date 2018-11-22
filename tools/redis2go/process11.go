@@ -68,7 +68,8 @@ func doType11() error {
 	template = strings.Replace(template, "{{fields_init}}", getFieldsInit(), -1)
 	template = strings.Replace(template, "{{func_get}}", getFuncGet(), -1)
 	template = strings.Replace(template, "{{func_set}}", getFuncSet(), -1)
-	template = strings.Replace(template, "{{fields_save}}", getFuncSave(), -1)
+	template = strings.Replace(template, "{{fields_save}}", getFuncSave(getFuncStringSave), -1)
+	template = strings.Replace(template, "{{fields_save2}}", getFuncSave(getFuncStringSave2), -1)
 
 	if hasStructField() {
 		template = strings.Replace(template, "{{fmt_ctructgo}}", "cstruct \"github.com/fananchong/cstruct-go\"", -1)
@@ -214,7 +215,14 @@ func getFuncSet() string {
 		if isBaseType(v) == false {
 			continue
 		}
-		template := setFuncString
+		template := ""
+		if v == "string" {
+			template = setFuncString_fieldstring
+		} else if v == "[]byte" {
+			template = setFuncString_fieldbyte
+		} else {
+			template = setFuncString
+		}
 		template = strings.Replace(template, "{{classname}}", className, -1)
 		template = strings.Replace(template, "{{field_type}}", v, -1)
 		template = strings.Replace(template, "{{field_name_upper}}", toUpper(k), -1)
@@ -232,12 +240,12 @@ func getFuncDbKeyInt() string {
 	return template
 }
 
-func getFuncSave() string {
+func getFuncSave(temp string) string {
 	var ret string = ""
 	for _, k := range sortFields() {
 		v := fields[k].(string)
 		if isBaseType(v) == false {
-			template := getFuncStringSave
+			template := temp
 			template = strings.Replace(template, "{{field_name_lower}}", toLower(k), -1)
 			template = strings.Replace(template, "{{field_name_lower_all}}", strings.ToLower(k), -1)
 			if len(ret) != 0 {
@@ -272,3 +280,4 @@ func sortFields() []string {
 	sort.Strings(ret)
 	return ret
 }
+

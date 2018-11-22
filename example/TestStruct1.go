@@ -170,6 +170,47 @@ func (this *TestStruct1) Expire(v uint) {
 	this.__expire = v
 }
 
+func (this *TestStruct1) DirtyData() (map[string]interface{}, error) {
+	data := make(map[string]interface{})
+	for k, v := range this.__dirtyData {
+		data[k] = v
+	}
+	for k, _ := range this.__dirtyDataForStructFiled {
+		_ = k
+		if k == "myst1" {
+			data, err := cstruct.Marshal(&this.myst1)
+			if err != nil {
+				return nil, err
+			}
+			this.__dirtyData["myst1"] = data
+		}
+		if k == "myst2" {
+			data, err := cstruct.Marshal(&this.myst2)
+			if err != nil {
+				return nil, err
+			}
+			this.__dirtyData["myst2"] = data
+		}
+	}
+	return data, nil
+}
+
+func (this *TestStruct1) Save2(dirtyData map[string]interface{}) error {
+	if len(dirtyData) == 0 {
+		return nil
+	}
+	db := go_redis_orm.GetDB(this.__dbName)
+	if _, err := db.Do("HMSET", redis.Args{}.Add(this.__dbKey).AddFlat(dirtyData)...); err != nil {
+		return err
+	}
+	if this.__expire != 0 {
+		if _, err := db.Do("EXPIRE", this.__dbKey, this.__expire); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 func (this *TestStruct1) GetMyb() bool {
 	return this.myb
 }
@@ -293,10 +334,12 @@ func (this *TestStruct1) SetMyi9(value uint64) {
 
 func (this *TestStruct1) SetMys1(value string) {
 	this.mys1 = value
-	this.__dirtyData["mys1"] = value
+	this.__dirtyData["mys1"] = string([]byte(value))
 }
 
 func (this *TestStruct1) SetMys2(value []byte) {
 	this.mys2 = value
-	this.__dirtyData["mys2"] = value
+	var tmp []byte = make([]byte, len(value))
+	copy(tmp, value)
+	this.__dirtyData["mys2"] = tmp
 }

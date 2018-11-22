@@ -75,7 +75,7 @@ func (this *{{classname}}) Save() error {
 	if len(this.__dirtyData) == 0 && len(this.__dirtyDataForStructFiled) == 0 {
 		return nil
 	}
-	for k,_ :=range(this.__dirtyDataForStructFiled) {
+	for k,_ := range(this.__dirtyDataForStructFiled) {
 		_ = k
 		{{fields_save}}
 	}
@@ -112,6 +112,34 @@ func (this *{{classname}}) Expire(v uint) {
 	this.__expire = v
 }
 
+func (this *{{classname}}) DirtyData() (map[string]interface{}, error) {
+	data := make(map[string]interface{})
+	for k, v := range(this.__dirtyData) {
+		data[k] = v
+	}
+	for k,_ := range(this.__dirtyDataForStructFiled) {
+		_ = k
+		{{fields_save2}}
+	}
+	return data, nil
+}
+
+func (this *{{classname}}) Save2(dirtyData map[string]interface{}) error {
+	if len(dirtyData) == 0 {
+		return nil
+	}
+	db := go_redis_orm.GetDB(this.__dbName)
+	if _, err := db.Do("HMSET", redis.Args{}.Add(this.__dbKey).AddFlat(dirtyData)...); err != nil {
+		return err
+	}
+	if this.__expire != 0 {
+		if _, err := db.Do("EXPIRE", this.__dbKey, this.__expire); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 {{func_get}}
 
 {{func_set}}`
@@ -123,6 +151,18 @@ const getFuncString = `func (this *{{classname}}) Get{{field_name_upper}}() {{fi
 const setFuncString = `func (this *{{classname}}) Set{{field_name_upper}}(value {{field_type}}) {
 	this.{{field_name_lower}} = value
 	this.__dirtyData["{{field_name_lower_all}}"] = value
+}`
+
+const setFuncString_fieldstring = `func (this *{{classname}}) Set{{field_name_upper}}(value {{field_type}}) {
+	this.{{field_name_lower}} = value
+	this.__dirtyData["{{field_name_lower_all}}"] = string([]byte(value))
+}`
+
+const setFuncString_fieldbyte = `func (this *{{classname}}) Set{{field_name_upper}}(value {{field_type}}) {
+	this.{{field_name_lower}} = value
+	var tmp []byte = make([]byte, len(value))
+	copy(tmp, value)
+	this.__dirtyData["{{field_name_lower_all}}"] = tmp
 }`
 
 const getFuncStringForStructFiled = `func (this *{{classname}}) Get{{field_name_upper}}(mutable bool) *{{field_type}} {
@@ -140,6 +180,15 @@ const getFuncStringSave = `if k == "{{field_name_lower_all}}" {
 	this.__dirtyData["{{field_name_lower_all}}"] = data
 }`
 
+const getFuncStringSave2 = `if k == "{{field_name_lower_all}}" {
+	data, err := cstruct.Marshal(&this.{{field_name_lower}})
+	if err != nil {
+		return nil, err
+	}
+	this.__dirtyData["{{field_name_lower_all}}"] = data
+}`
+
 const dbkeyFuncString_int = `"{{classname}}:" + fmt.Sprintf("%d", key)`
 
 const dbkeyFuncString_str = `"{{classname}}:" + key`
+

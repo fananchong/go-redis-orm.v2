@@ -149,6 +149,36 @@ func (this *{{classname}}) GetItems() []*{{classname}}Item {
 	return ret
 }
 
+func (this *{{classname}}) DirtyData() (map[{{sub_key_type}}][]byte, error) {
+	data := make(map[{{sub_key_type}}][]byte)
+	for k, _ := range this.__dirtyData {
+		if item, ok := this.values[k]; ok {
+			var err error
+			data[k], err = item.Marshal()
+			if err != nil {
+				return nil, err
+			}
+		}
+	}
+	return data, nil
+}
+
+func (this *{{classname}}) Save2(dirtyData map[{{sub_key_type}}][]byte) error {
+	if len(dirtyData) == 0 {
+		return nil
+	}
+	db := go_redis_orm.GetDB(this.__dbName)
+	if _, err := db.Do("HMSET", redis.Args{}.Add(this.__dbKey).AddFlat(dirtyData)...); err != nil {
+		return err
+	}
+	if this.__expire != 0 {
+		if _, err := db.Do("EXPIRE", this.__dbKey, this.__expire); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 func (this *{{classname}}) IsLoad() bool {
 	return this.__isLoad
 }
@@ -162,3 +192,4 @@ const convSubKeyFuncString_int = `tempUint64, err := strconv.ParseUint(temp, 10,
 subKey := {{sub_key_type}}(tempUint64)`
 
 const convSubKeyFuncString_str = `subKey := temp`
+
