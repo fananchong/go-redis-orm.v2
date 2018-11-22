@@ -171,10 +171,6 @@ func (this *TestStruct1) Expire(v uint) {
 }
 
 func (this *TestStruct1) DirtyData() (map[string]interface{}, error) {
-	data := make(map[string]interface{})
-	for k, v := range this.__dirtyData {
-		data[k] = v
-	}
 	for k, _ := range this.__dirtyDataForStructFiled {
 		_ = k
 		if k == "myst1" {
@@ -192,6 +188,12 @@ func (this *TestStruct1) DirtyData() (map[string]interface{}, error) {
 			this.__dirtyData["myst2"] = data
 		}
 	}
+	data := make(map[string]interface{})
+	for k, v := range this.__dirtyData {
+		data[k] = v
+	}
+	this.__dirtyData = make(map[string]interface{})
+	this.__dirtyDataForStructFiled = make(map[string]interface{})
 	return data, nil
 }
 

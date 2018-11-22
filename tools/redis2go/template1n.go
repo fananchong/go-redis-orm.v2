@@ -160,6 +160,7 @@ func (this *{{classname}}) DirtyData() (map[{{sub_key_type}}][]byte, error) {
 			}
 		}
 	}
+	this.__dirtyData = make(map[{{sub_key_type}}]int)
 	return data, nil
 }
 

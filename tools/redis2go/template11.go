@@ -113,14 +113,16 @@ func (this *{{classname}}) Expire(v uint) {
 }
 
 func (this *{{classname}}) DirtyData() (map[string]interface{}, error) {
-	data := make(map[string]interface{})
-	for k, v := range(this.__dirtyData) {
-		data[k] = v
-	}
 	for k,_ := range(this.__dirtyDataForStructFiled) {
 		_ = k
 		{{fields_save2}}
 	}
+	data := make(map[string]interface{})
+	for k, v := range(this.__dirtyData) {
+		data[k] = v
+	}
+	this.__dirtyData = make(map[string]interface{})
+	this.__dirtyDataForStructFiled = make(map[string]interface{})
 	return data, nil
 }
 

@@ -159,6 +159,7 @@ func (this *TestStruct2) DirtyData() (map[int32][]byte, error) {
 			}
 		}
 	}
+	this.__dirtyData = make(map[int32]int)
 	return data, nil
 }
 
