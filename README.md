@@ -15,7 +15,9 @@ redis2go --input_dir=./example/redis_def --output_dir=./example --package=main
 ## 可以处理的类型
 
 - 支持 golang 基本类型
-- 以及简单的复合结构体（ cstruct-go 可支持的所有类型）
+- 以及简单的复合结构体
+  - encoding/json 可支持的所有类型
+  - cstruct-go 可支持的所有类型
 
 例子可以参考：[example](example)
 
@@ -34,6 +36,8 @@ Delete | 删除本条数据
 SetYYY | 修改YYY属性
 GetYYY | 获取YYY属性
 HasKey | 是否有某条数据
+DirtyData | 获取脏数据
+Save2     | 以脏数据为参数，保存操作
 
 1对1类型，redis操作类，映射到redis hashmap上。
 
@@ -102,6 +106,8 @@ NewItem    | 增加1条数据
 GetItem    | 获取某条数据
 DeleteItem | 删除某条数据
 GetItems   | 获取所有条数据
+DirtyData  | 获取脏数据
+Save2      | 以脏数据为参数，保存操作
 
 1对N类型，redis操作类，映射到redis hashmap上。
 
