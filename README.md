@@ -169,11 +169,11 @@ func test1n() {
 
 ## 使用方法
 
-1. 定义json文件
+1. 定义 json 文件
 
-    格式参考：example/redis_def/*.json
+    格式参考：[example/redis_def](example/redis_def)
 
-2. 生成go文件，参考example/g.sh
+2. 生成 go 文件，参考 [example/g.sh](example/g.sh)
 
 ## 编译
 
