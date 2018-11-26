@@ -12,6 +12,7 @@ go get -u -d github.com/FZambia/sentinel
 go get -u -d github.com/mna/redisc
 go get -u -d github.com/fananchong/goredis
 go get -u -d github.com/fananchong/cstruct-go
+go get -u -d github.com/golang/protobuf/proto
 
 unset GOPATH
 

@@ -9,7 +9,6 @@ import (
 	"errors"
 	"fmt"
 	cstruct "github.com/fananchong/cstruct-go"
-
 	go_redis_orm "github.com/fananchong/go-redis-orm.v2"
 	"github.com/gomodule/redigo/redis"
 )
@@ -29,8 +28,8 @@ type TestStruct5 struct {
 	myi9  uint64
 	mys1  string
 	mys2  []byte
-	myst1 StrcutXX
-	myst2 StrcutYY
+	myst1 StructXX
+	myst2 StructYY
 
 	__dirtyData               map[string]interface{}
 	__dirtyDataForStructFiled map[string]interface{}
@@ -266,14 +265,14 @@ func (this *TestStruct5) GetMys2() []byte {
 	return this.mys2
 }
 
-func (this *TestStruct5) GetMyst1(mutable bool) *StrcutXX {
+func (this *TestStruct5) GetMyst1(mutable bool) *StructXX {
 	if mutable {
 		this.__dirtyDataForStructFiled["myst1"] = nil
 	}
 	return &this.myst1
 }
 
-func (this *TestStruct5) GetMyst2(mutable bool) *StrcutYY {
+func (this *TestStruct5) GetMyst2(mutable bool) *StructYY {
 	if mutable {
 		this.__dirtyDataForStructFiled["myst2"] = nil
 	}

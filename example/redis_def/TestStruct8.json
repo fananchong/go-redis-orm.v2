@@ -1,0 +1,9 @@
+{
+  "name": "TestStruct8",
+  "type": "1-n",
+  "key": "int32",
+  "subkey": "int32",
+  "struct_format": "protobuf",
+  "field": "StructZZ",
+  "desc": "protobuf，比较特殊，1-n 类型只能有1个子类型"
+}

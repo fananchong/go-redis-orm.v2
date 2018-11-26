@@ -14,14 +14,14 @@ func doType1n() error {
 	template = strings.Replace(template, "{{packagename}}", *packageName, -1)
 	template = strings.Replace(template, "{{classname}}", className, -1)
 	template = strings.Replace(template, "{{key_type}}", keyType, -1)
-	template = strings.Replace(template, "{{sub_key_type}}", sbuKeyType, -1)
+	template = strings.Replace(template, "{{sub_key_type}}", subKeyType, -1)
 	template = strings.Replace(template, "{{fields_def}}", getFieldsDef(false), -1)
 
-	if !strings.Contains(sbuKeyType, "int") && sbuKeyType != "string" {
-		return errors.New("subkey type error. type = " + sbuKeyType)
+	if !strings.Contains(subKeyType, "int") && subKeyType != "string" {
+		return errors.New("subkey type error. type = " + subKeyType)
 	}
 	template = strings.Replace(template, "{{conv_subkey}}", getConvSubKey(), -1)
-	if strings.Contains(sbuKeyType, "int") {
+	if strings.Contains(subKeyType, "int") {
 		template = strings.Replace(template, "{{strconv}}", "\"strconv\"", -1)
 	} else {
 		template = strings.Replace(template, "{{strconv}}", "", -1)
@@ -52,25 +52,33 @@ func doType1n() error {
 
 	// template1n_subitem
 	template = template1n_subitem
+	if format == "protobuf" {
+		template = template1n_subitem2
+	}
 	template = strings.Replace(template, "{{packagename}}", *packageName, -1)
 	template = strings.Replace(template, "{{classname}}", className, -1)
-	template = strings.Replace(template, "{{sub_key_type}}", sbuKeyType, -1)
+	template = strings.Replace(template, "{{sub_key_type}}", subKeyType, -1)
+	template = strings.Replace(template, "{{sub_item_type}}", subItemType, -1)
 	template = strings.Replace(template, "{{fields_def}}", getFieldsDef(true), -1)
 	template = strings.Replace(template, "{{func_get1n}}", getFuncGet1n(), -1)
 	template = strings.Replace(template, "{{func_set1n}}", getFuncSet1n(), -1)
 
 	if format == "cstruct-go" {
-		template = strings.Replace(template, "{{cstruct-go}}", "cstruct \"github.com/fananchong/cstruct-go\"", -1)
-		template = strings.Replace(template, "{{json}}", "", -1)
+		template = strings.Replace(template, "{{import_struct_format}}", "cstruct \"github.com/fananchong/cstruct-go\"", -1)
 	} else if format == "json" {
-		template = strings.Replace(template, "{{cstruct-go}}", "", -1)
-		template = strings.Replace(template, "{{json}}", "\"encoding/json\"", -1)
+		template = strings.Replace(template, "{{import_struct_format}}", "\"encoding/json\"", -1)
+	} else if format == "protobuf" {
+		template = strings.Replace(template, "{{import_struct_format}}", "\"github.com/golang/protobuf/proto\"", -1)
+	} else if format != "" {
+		panic("unknow format, format =" + format)
 	}
 
 	if format == "cstruct-go" {
 		template = strings.Replace(template, "{{struct_format}}", "cstruct", -1)
 	} else if format == "json" {
 		template = strings.Replace(template, "{{struct_format}}", "json", -1)
+	} else if format == "protobuf" {
+		template = strings.Replace(template, "{{struct_format}}", "proto", -1)
 	}
 
 	outpath = *outDir + "/" + className + "Item.go"
@@ -87,10 +95,10 @@ func doType1n() error {
 
 func getConvSubKey() string {
 	var template = ""
-	if strings.Contains(sbuKeyType, "int") {
+	if strings.Contains(subKeyType, "int") {
 		template = convSubKeyFuncString_int
-		template = strings.Replace(template, "{{sub_key_type}}", sbuKeyType, -1)
-	} else if sbuKeyType == "string" {
+		template = strings.Replace(template, "{{sub_key_type}}", subKeyType, -1)
+	} else if subKeyType == "string" {
 		template = convSubKeyFuncString_str
 	}
 	return template

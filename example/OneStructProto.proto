@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package main;
+
+message StructZZ
+{
+	double F3 = 3;
+	string F4 = 4;
+}

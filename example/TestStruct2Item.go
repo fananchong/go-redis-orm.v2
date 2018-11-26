@@ -22,8 +22,8 @@ type TestStruct2ItemData struct {
 	Myi9  uint64
 	Mys1  string
 	Mys2  []byte
-	Myst1 StrcutXX
-	Myst2 StrcutYY
+	Myst1 StructXX
+	Myst2 StructYY
 }
 
 type TestStruct2Item struct {
@@ -91,14 +91,14 @@ func (this *TestStruct2Item) GetMys2() []byte {
 	return this.__data.Mys2
 }
 
-func (this *TestStruct2Item) GetMyst1(mutable bool) *StrcutXX {
+func (this *TestStruct2Item) GetMyst1(mutable bool) *StructXX {
 	if mutable {
 		this.__root.__dirtyData[this.SubKey] = 1
 	}
 	return &this.__data.Myst1
 }
 
-func (this *TestStruct2Item) GetMyst2(mutable bool) *StrcutYY {
+func (this *TestStruct2Item) GetMyst2(mutable bool) *StructYY {
 	if mutable {
 		this.__root.__dirtyData[this.SubKey] = 1
 	}

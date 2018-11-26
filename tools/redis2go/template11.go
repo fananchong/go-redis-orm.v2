@@ -10,8 +10,7 @@ package {{packagename}}
 import (
 	"errors"
 	{{fmt}}
-	{{cstruct-go}}
-	{{json}}
+	{{import_struct_format}}
 	go_redis_orm "github.com/fananchong/go-redis-orm.v2"
 	"github.com/gomodule/redigo/redis"
 )

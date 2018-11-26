@@ -1,10 +1,10 @@
 package main
 
-type StrcutXX struct {
+type StructXX struct {
 	A int32
 	B float32
 }
 
-type StrcutYY struct {
+type StructYY struct {
 	C []uint16
 }

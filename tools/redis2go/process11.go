@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"os/exec"
 	"sort"
@@ -11,12 +12,13 @@ import (
 )
 
 var (
-	className  string                 = ""
-	keyType    string                 = ""
-	sbuKeyType string                 = ""
-	structType string                 = ""
-	fields     map[string]interface{} = nil
-	format     string                 = ""
+	className   string                 = ""
+	keyType     string                 = ""
+	subKeyType  string                 = ""
+	subItemType string                 = ""
+	structType  string                 = ""
+	fields      map[string]interface{} = nil
+	format      string                 = ""
 )
 
 func doFile(js *simplejson.Json) error {
@@ -36,13 +38,22 @@ func doFile(js *simplejson.Json) error {
 	if err != nil {
 		return err
 	}
-	fields, err = js.Get("fields").Map()
-	if err != nil {
-		return err
-	}
 	format, err = js.Get("struct_format").String()
 	if err != nil || format == "" {
 		format = "cstruct-go"
+	}
+	if format == "protobuf" && structType == "1-n" {
+		subItemType, err = js.Get("field").String()
+		if err != nil {
+			fmt.Println("can't find 'field'")
+			return err
+		}
+	} else {
+		fields, err = js.Get("fields").Map()
+		if err != nil {
+			fmt.Println("can't find 'fields'")
+			return err
+		}
 	}
 	if err := checkFieldType(); err != nil {
 		return err
@@ -50,11 +61,11 @@ func doFile(js *simplejson.Json) error {
 	if structType == "1-1" {
 		return doType11()
 	} else if structType == "1-n" {
-		sbuKeyType, err = js.Get("subkey").String()
+		subKeyType, err = js.Get("subkey").String()
 		if err != nil {
 			return err
 		}
-		if sbuKeyType == "uint" || sbuKeyType == "int" {
+		if subKeyType == "uint" || subKeyType == "int" {
 			return errors.New("no support type: uint or int. please use uint8 int8 uint16 int16 ... etc")
 		}
 		return doType1n()
@@ -78,15 +89,16 @@ func doType11() error {
 
 	if hasStructField() {
 		if format == "cstruct-go" {
-			template = strings.Replace(template, "{{cstruct-go}}", "cstruct \"github.com/fananchong/cstruct-go\"", -1)
-			template = strings.Replace(template, "{{json}}", "", -1)
+			template = strings.Replace(template, "{{import_struct_format}}", "cstruct \"github.com/fananchong/cstruct-go\"", -1)
 		} else if format == "json" {
-			template = strings.Replace(template, "{{cstruct-go}}", "", -1)
-			template = strings.Replace(template, "{{json}}", "\"encoding/json\"", -1)
+			template = strings.Replace(template, "{{import_struct_format}}", "\"encoding/json\"", -1)
+		} else if format == "protobuf" {
+			template = strings.Replace(template, "{{import_struct_format}}", "\"github.com/golang/protobuf/proto\"", -1)
+		} else if format != "" {
+			panic("unknow format, format =" + format)
 		}
 	} else {
-		template = strings.Replace(template, "{{cstruct-go}}", "", -1)
-		template = strings.Replace(template, "{{json}}", "", -1)
+		template = strings.Replace(template, "{{import_struct_format}}", "", -1)
 	}
 
 	if strings.Contains(keyType, "int") {
@@ -103,6 +115,8 @@ func doType11() error {
 		template = strings.Replace(template, "{{struct_format}}", "cstruct", -1)
 	} else if format == "json" {
 		template = strings.Replace(template, "{{struct_format}}", "json", -1)
+	} else if format == "protobuf" {
+		template = strings.Replace(template, "{{struct_format}}", "proto", -1)
 	}
 
 	outpath := *outDir + "/" + className + ".go"
