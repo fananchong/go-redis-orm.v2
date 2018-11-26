@@ -15,9 +15,13 @@ redis2go --input_dir=./example/redis_def --output_dir=./example --package=main
 ## 可以处理的类型
 
 - 支持 golang 基本类型
-- 以及简单的复合结构体
-  - encoding/json 可支持的所有类型
-  - cstruct-go 可支持的所有类型
+- 支持结构体，具体如下：
+
+编码           | json 文件定义例子
+---------------|----------------------
+encoding/json  | [example/redis_def/TestStruct1.json](example/redis_def/TestStruct1.json) 、 [example/redis_def/TestStruct2.json](example/redis_def/TestStruct2.json) 
+protobuf       | [example/redis_def/TestStruct7.json](example/redis_def/TestStruct7.json) 、 [example/redis_def/TestStruct8.json](example/redis_def/TestStruct8.json) 
+cstruct-go     | [example/redis_def/TestStruct5.json](example/redis_def/TestStruct5.json) 、 [example/redis_def/TestStruct6.json](example/redis_def/TestStruct6.json) 
 
 例子可以参考：[example](example)
 
@@ -215,7 +219,6 @@ type IClient interface {
 
 
 ## TODO
-- 可以自定义`序列化 struct 字段的`方法，比如使用 json 、 protobuf 以及其他
 - 可以自定义 save 、 del 方法，方便用户可以网络投递给数据代理服务器
 
 
