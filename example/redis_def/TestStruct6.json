@@ -1,8 +1,9 @@
 {
-  "name": "TestStruct1",
-  "type": "1-1",
-  "key": "uint64",
-  "struct_format": "json",
+  "name": "TestStruct6",
+  "type": "1-n",
+  "key": "int32",
+  "subkey": "int32",
+  "struct_format": "cstruct-go",
   "fields": {
     "myb": "bool",
     "myi1": "int8",
@@ -17,7 +18,7 @@
     "myf2": "float64",
     "mys1": "string",
     "mys2": "[]byte",
-    "myst1": "StrcutXX",
+	"myst1": "StrcutXX",
     "myst2": "StrcutYY"
   }
 }

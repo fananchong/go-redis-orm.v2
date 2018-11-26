@@ -16,6 +16,7 @@ var (
 	sbuKeyType string                 = ""
 	structType string                 = ""
 	fields     map[string]interface{} = nil
+	format     string                 = ""
 )
 
 func doFile(js *simplejson.Json) error {
@@ -38,6 +39,10 @@ func doFile(js *simplejson.Json) error {
 	fields, err = js.Get("fields").Map()
 	if err != nil {
 		return err
+	}
+	format, err = js.Get("struct_format").String()
+	if err != nil || format == "" {
+		format = "cstruct-go"
 	}
 	if err := checkFieldType(); err != nil {
 		return err
@@ -72,9 +77,16 @@ func doType11() error {
 	template = strings.Replace(template, "{{fields_save2}}", getFuncSave(getFuncStringSave2), -1)
 
 	if hasStructField() {
-		template = strings.Replace(template, "{{fmt_ctructgo}}", "cstruct \"github.com/fananchong/cstruct-go\"", -1)
+		if format == "cstruct-go" {
+			template = strings.Replace(template, "{{cstruct-go}}", "cstruct \"github.com/fananchong/cstruct-go\"", -1)
+			template = strings.Replace(template, "{{json}}", "", -1)
+		} else if format == "json" {
+			template = strings.Replace(template, "{{cstruct-go}}", "", -1)
+			template = strings.Replace(template, "{{json}}", "\"encoding/json\"", -1)
+		}
 	} else {
-		template = strings.Replace(template, "{{fmt_ctructgo}}", "", -1)
+		template = strings.Replace(template, "{{cstruct-go}}", "", -1)
+		template = strings.Replace(template, "{{json}}", "", -1)
 	}
 
 	if strings.Contains(keyType, "int") {
@@ -85,6 +97,12 @@ func doType11() error {
 		template = strings.Replace(template, "{{fmt}}", "", -1)
 	} else {
 		return errors.New("key type error. type = " + keyType)
+	}
+
+	if format == "cstruct-go" {
+		template = strings.Replace(template, "{{struct_format}}", "cstruct", -1)
+	} else if format == "json" {
+		template = strings.Replace(template, "{{struct_format}}", "json", -1)
 	}
 
 	outpath := *outDir + "/" + className + ".go"
@@ -180,7 +198,7 @@ func getFieldsInit() string {
 		}
 		v := fields[k].(string)
 		if isBaseType(v) == false {
-			ret = ret + "if err := cstruct.Unmarshal(data." + toUpper(k) + ", &" + "this." + toLower(k) + "); err != nil {\n"
+			ret = ret + "if err := {{struct_format}}.Unmarshal(data." + toUpper(k) + ", &" + "this." + toLower(k) + "); err != nil {\n"
 			ret = ret + "return err\n"
 			ret = ret + "}\n"
 		} else {

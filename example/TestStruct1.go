@@ -8,7 +8,8 @@ package main
 import (
 	"errors"
 	"fmt"
-	cstruct "github.com/fananchong/cstruct-go"
+
+	"encoding/json"
 	go_redis_orm "github.com/fananchong/go-redis-orm.v2"
 	"github.com/gomodule/redigo/redis"
 )
@@ -104,11 +105,11 @@ func (this *TestStruct1) Load() error {
 	this.myi9 = data.Myi9
 	this.mys1 = data.Mys1
 	this.mys2 = data.Mys2
-	if err := cstruct.Unmarshal(data.Myst1, &this.myst1); err != nil {
+	if err := json.Unmarshal(data.Myst1, &this.myst1); err != nil {
 		return err
 	}
 
-	if err := cstruct.Unmarshal(data.Myst2, &this.myst2); err != nil {
+	if err := json.Unmarshal(data.Myst2, &this.myst2); err != nil {
 		return err
 	}
 
@@ -123,14 +124,14 @@ func (this *TestStruct1) Save() error {
 	for k, _ := range this.__dirtyDataForStructFiled {
 		_ = k
 		if k == "myst1" {
-			data, err := cstruct.Marshal(&this.myst1)
+			data, err := json.Marshal(&this.myst1)
 			if err != nil {
 				return err
 			}
 			this.__dirtyData["myst1"] = data
 		}
 		if k == "myst2" {
-			data, err := cstruct.Marshal(&this.myst2)
+			data, err := json.Marshal(&this.myst2)
 			if err != nil {
 				return err
 			}
@@ -174,14 +175,14 @@ func (this *TestStruct1) DirtyData() (map[string]interface{}, error) {
 	for k, _ := range this.__dirtyDataForStructFiled {
 		_ = k
 		if k == "myst1" {
-			data, err := cstruct.Marshal(&this.myst1)
+			data, err := json.Marshal(&this.myst1)
 			if err != nil {
 				return nil, err
 			}
 			this.__dirtyData["myst1"] = data
 		}
 		if k == "myst2" {
-			data, err := cstruct.Marshal(&this.myst2)
+			data, err := json.Marshal(&this.myst2)
 			if err != nil {
 				return nil, err
 			}

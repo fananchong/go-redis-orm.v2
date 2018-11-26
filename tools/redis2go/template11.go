@@ -10,7 +10,8 @@ package {{packagename}}
 import (
 	"errors"
 	{{fmt}}
-	{{fmt_ctructgo}}
+	{{cstruct-go}}
+	{{json}}
 	go_redis_orm "github.com/fananchong/go-redis-orm.v2"
 	"github.com/gomodule/redigo/redis"
 )
@@ -175,7 +176,7 @@ const getFuncStringForStructFiled = `func (this *{{classname}}) Get{{field_name_
 }`
 
 const getFuncStringSave = `if k == "{{field_name_lower_all}}" {
-	data, err := cstruct.Marshal(&this.{{field_name_lower}})
+	data, err := {{struct_format}}.Marshal(&this.{{field_name_lower}})
 	if err != nil {
 		return err
 	}
@@ -183,7 +184,7 @@ const getFuncStringSave = `if k == "{{field_name_lower_all}}" {
 }`
 
 const getFuncStringSave2 = `if k == "{{field_name_lower_all}}" {
-	data, err := cstruct.Marshal(&this.{{field_name_lower}})
+	data, err := {{struct_format}}.Marshal(&this.{{field_name_lower}})
 	if err != nil {
 		return nil, err
 	}
@@ -193,4 +194,3 @@ const getFuncStringSave2 = `if k == "{{field_name_lower_all}}" {
 const dbkeyFuncString_int = `"{{classname}}:" + fmt.Sprintf("%d", key)`
 
 const dbkeyFuncString_str = `"{{classname}}:" + key`
-

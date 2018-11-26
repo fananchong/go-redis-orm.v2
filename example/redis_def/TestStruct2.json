@@ -3,6 +3,7 @@
   "type": "1-n",
   "key": "int32",
   "subkey": "int32",
+  "struct_format": "json",
   "fields": {
     "myb": "bool",
     "myi1": "int8",

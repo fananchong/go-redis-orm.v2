@@ -1,8 +1,8 @@
 {
-  "name": "TestStruct1",
+  "name": "TestStruct5",
   "type": "1-1",
   "key": "uint64",
-  "struct_format": "json",
+  "struct_format": "cstruct-go",
   "fields": {
     "myb": "bool",
     "myi1": "int8",

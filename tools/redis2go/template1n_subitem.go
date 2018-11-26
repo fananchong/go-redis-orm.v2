@@ -7,7 +7,8 @@ const template1n_subitem string = `/// -----------------------------------------
 package {{packagename}}
 
 import (
-	cstruct "github.com/fananchong/cstruct-go"
+	{{cstruct-go}}
+	{{json}}
 )
 
 type {{classname}}ItemData struct {
@@ -32,14 +33,14 @@ func New{{classname}}Item(subKey {{sub_key_type}}, root *{{classname}}) *{{class
 {{func_set1n}}
 
 func (this *{{classname}}Item) Unmarshal(data []byte) error {
-	if err := cstruct.Unmarshal(data, &this.__data); err != nil {
+	if err := {{struct_format}}.Unmarshal(data, &this.__data); err != nil {
 		return err
 	}
 	return nil
 }
 
 func (this *{{classname}}Item) Marshal() ([]byte, error) {
-	data, err := cstruct.Marshal(&this.__data)
+	data, err := {{struct_format}}.Marshal(&this.__data)
 	if err != nil {
 		return nil, err
 	}

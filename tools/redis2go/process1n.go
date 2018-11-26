@@ -58,6 +58,21 @@ func doType1n() error {
 	template = strings.Replace(template, "{{fields_def}}", getFieldsDef(true), -1)
 	template = strings.Replace(template, "{{func_get1n}}", getFuncGet1n(), -1)
 	template = strings.Replace(template, "{{func_set1n}}", getFuncSet1n(), -1)
+
+	if format == "cstruct-go" {
+		template = strings.Replace(template, "{{cstruct-go}}", "cstruct \"github.com/fananchong/cstruct-go\"", -1)
+		template = strings.Replace(template, "{{json}}", "", -1)
+	} else if format == "json" {
+		template = strings.Replace(template, "{{cstruct-go}}", "", -1)
+		template = strings.Replace(template, "{{json}}", "\"encoding/json\"", -1)
+	}
+
+	if format == "cstruct-go" {
+		template = strings.Replace(template, "{{struct_format}}", "cstruct", -1)
+	} else if format == "json" {
+		template = strings.Replace(template, "{{struct_format}}", "json", -1)
+	}
+
 	outpath = *outDir + "/" + className + "Item.go"
 	err = ioutil.WriteFile(outpath, []byte(template), 0666)
 	if err != nil {
