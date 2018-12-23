@@ -126,7 +126,14 @@ func doType11() error {
 	if err != nil {
 		return err
 	}
-	err = exec.Command("gofmt", "-w", outpath).Run()
+	return exec_gofmt(outpath)
+}
+
+func exec_gofmt(outpath string) error {
+	err := exec.Command("gofmt", "-w", outpath).Run()
+	if err != nil {
+		err = exec.Command("./gofmt", "-w", outpath).Run()
+	}
 	if err != nil {
 		err = exec.Command("/usr/local/go/bin/gofmt", "-w", outpath).Run()
 	}

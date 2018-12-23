@@ -3,7 +3,6 @@ package main
 import (
 	"errors"
 	"io/ioutil"
-	"os/exec"
 	"strings"
 )
 
@@ -42,10 +41,7 @@ func doType1n() error {
 	if err != nil {
 		return err
 	}
-	err = exec.Command("gofmt", "-w", outpath).Run()
-	if err != nil {
-		err = exec.Command("/usr/local/go/bin/gofmt", "-w", outpath).Run()
-	}
+	err = exec_gofmt(outpath)
 	if err != nil {
 		return err
 	}
@@ -88,11 +84,7 @@ func doType1n() error {
 	if err != nil {
 		return err
 	}
-	err = exec.Command("gofmt", "-w", outpath).Run()
-	if err != nil {
-		err = exec.Command("/usr/local/go/bin/gofmt", "-w", outpath).Run()
-	}
-	return err
+	return exec_gofmt(outpath)
 }
 
 func getConvSubKey() string {
