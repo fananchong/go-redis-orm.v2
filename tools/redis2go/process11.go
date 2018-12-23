@@ -121,7 +121,7 @@ func doType11() error {
 		template = strings.Replace(template, "{{struct_format}}", "proto", -1)
 	}
 
-	outpath := *outDir + "/" + className + ".go"
+	outpath := *outDir + "/" + strings.ToLower(className) + ".go"
 	err := ioutil.WriteFile(outpath, []byte(template), 0666)
 	if err != nil {
 		return err

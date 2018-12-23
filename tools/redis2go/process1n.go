@@ -37,7 +37,7 @@ func doType1n() error {
 		return errors.New("key type error. type = " + keyType)
 	}
 
-	outpath := *outDir + "/" + className + ".go"
+	outpath := *outDir + "/" + strings.ToLower(className) + ".go"
 	err := ioutil.WriteFile(outpath, []byte(template), 0666)
 	if err != nil {
 		return err
@@ -83,7 +83,7 @@ func doType1n() error {
 		template = strings.Replace(template, "{{struct_format}}", "proto", -1)
 	}
 
-	outpath = *outDir + "/" + className + "Item.go"
+	outpath = *outDir + "/" + strings.ToLower(className) + "_item.go"
 	err = ioutil.WriteFile(outpath, []byte(template), 0666)
 	if err != nil {
 		return err
