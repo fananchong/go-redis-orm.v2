@@ -52,7 +52,7 @@ func doType1n() error {
 
 	// template1n_subitem
 	template = template1n_subitem
-	if format == "protobuf" {
+	if format == "protobuf" || format == "gogo" {
 		template = template1n_subitem2
 	}
 	template = strings.Replace(template, "{{packagename}}", *packageName, -1)
@@ -69,6 +69,8 @@ func doType1n() error {
 		template = strings.Replace(template, "{{import_struct_format}}", "\"encoding/json\"", -1)
 	} else if format == "protobuf" {
 		template = strings.Replace(template, "{{import_struct_format}}", "\"github.com/golang/protobuf/proto\"", -1)
+	} else if format == "gogo" {
+		template = strings.Replace(template, "{{import_struct_format}}", "\"github.com/gogo/protobuf/proto\"", -1)
 	} else if format != "" {
 		panic("unknow format, format =" + format)
 	}
@@ -77,7 +79,7 @@ func doType1n() error {
 		template = strings.Replace(template, "{{struct_format}}", "cstruct", -1)
 	} else if format == "json" {
 		template = strings.Replace(template, "{{struct_format}}", "json", -1)
-	} else if format == "protobuf" {
+	} else if format == "protobuf" || format == "gogo" {
 		template = strings.Replace(template, "{{struct_format}}", "proto", -1)
 	}
 

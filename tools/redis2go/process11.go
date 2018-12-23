@@ -42,7 +42,7 @@ func doFile(js *simplejson.Json) error {
 	if err != nil || format == "" {
 		format = "cstruct-go"
 	}
-	if format == "protobuf" && structType == "1-n" {
+	if (format == "protobuf" || format == "gogo") && structType == "1-n" {
 		subItemType, err = js.Get("field").String()
 		if err != nil {
 			fmt.Println("can't find 'field'")
@@ -94,6 +94,8 @@ func doType11() error {
 			template = strings.Replace(template, "{{import_struct_format}}", "\"encoding/json\"", -1)
 		} else if format == "protobuf" {
 			template = strings.Replace(template, "{{import_struct_format}}", "\"github.com/golang/protobuf/proto\"", -1)
+		} else if format == "gogo" {
+			template = strings.Replace(template, "{{import_struct_format}}", "\"github.com/gogo/protobuf/proto\"", -1)
 		} else if format != "" {
 			panic("unknow format, format =" + format)
 		}
@@ -115,7 +117,7 @@ func doType11() error {
 		template = strings.Replace(template, "{{struct_format}}", "cstruct", -1)
 	} else if format == "json" {
 		template = strings.Replace(template, "{{struct_format}}", "json", -1)
-	} else if format == "protobuf" {
+	} else if format == "protobuf" || format == "gogo" {
 		template = strings.Replace(template, "{{struct_format}}", "proto", -1)
 	}
 
@@ -312,4 +314,3 @@ func sortFields() []string {
 	sort.Strings(ret)
 	return ret
 }
-
