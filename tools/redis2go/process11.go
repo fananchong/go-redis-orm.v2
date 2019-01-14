@@ -12,13 +12,13 @@ import (
 )
 
 var (
-	className   string                 = ""
-	keyType     string                 = ""
-	subKeyType  string                 = ""
-	subItemType string                 = ""
-	structType  string                 = ""
-	fields      map[string]interface{} = nil
-	format      string                 = ""
+	className   = ""
+	keyType     = ""
+	subKeyType  = ""
+	subItemType = ""
+	structType  = ""
+	fields      map[string]interface{}
+	format      = ""
 )
 
 func doFile(js *simplejson.Json) error {
@@ -126,10 +126,10 @@ func doType11() error {
 	if err != nil {
 		return err
 	}
-	return exec_gofmt(outpath)
+	return execGoFmt(outpath)
 }
 
-func exec_gofmt(outpath string) error {
+func execGoFmt(outpath string) error {
 	err := exec.Command("gofmt", "-w", outpath).Run()
 	if err != nil {
 		err = exec.Command("/usr/local/go/bin/gofmt", "-w", outpath).Run()
@@ -140,7 +140,7 @@ func exec_gofmt(outpath string) error {
 	return err
 }
 
-var baseType map[string]int = make(map[string]int)
+var baseType = make(map[string]int)
 
 func isBaseType(k string) bool {
 	if len(baseType) == 0 {
@@ -187,7 +187,7 @@ func checkFieldType() error {
 }
 
 func getFieldsDef(up bool) string {
-	var ret string = ""
+	var ret string
 	for _, k := range sortFields() {
 		v := fields[k].(string)
 		if up == false {
@@ -200,7 +200,7 @@ func getFieldsDef(up bool) string {
 }
 
 func getFieldsDefDB() string {
-	var ret string = ""
+	var ret string
 	for _, k := range sortFields() {
 		v := fields[k].(string)
 		k2 := strings.ToUpper(string(k[0])) + string(k[1:])
@@ -214,7 +214,7 @@ func getFieldsDefDB() string {
 }
 
 func getFieldsInit() string {
-	var ret string = ""
+	var ret string
 	for _, k := range sortFields() {
 		if ret != "" {
 			ret = ret + "\n"
@@ -232,7 +232,7 @@ func getFieldsInit() string {
 }
 
 func getFuncGet() string {
-	var ret string = ""
+	var ret string
 	for _, k := range sortFields() {
 		v := fields[k].(string)
 		template := getFuncString
@@ -250,7 +250,7 @@ func getFuncGet() string {
 }
 
 func getFuncSet() string {
-	var ret string = ""
+	var ret string
 	for _, k := range sortFields() {
 		v := fields[k].(string)
 		if isBaseType(v) == false {
@@ -258,9 +258,9 @@ func getFuncSet() string {
 		}
 		template := ""
 		if v == "string" {
-			template = setFuncString_fieldstring
+			template = setFuncStringFieldstring
 		} else if v == "[]byte" {
-			template = setFuncString_fieldbyte
+			template = setFuncStringFieldbyte
 		} else {
 			template = setFuncString
 		}
@@ -275,14 +275,14 @@ func getFuncSet() string {
 }
 
 func getFuncDbKeyInt() string {
-	template := dbkeyFuncString_int
+	template := dbkeyFuncStringInt
 	template = strings.Replace(template, "{{classname}}", className, -1)
 	template = strings.Replace(template, "{{key_type}}", keyType, -1)
 	return template
 }
 
 func getFuncSave(temp string) string {
-	var ret string = ""
+	var ret string
 	for _, k := range sortFields() {
 		v := fields[k].(string)
 		if isBaseType(v) == false {
@@ -299,7 +299,7 @@ func getFuncSave(temp string) string {
 }
 
 func getFuncDbKeyStr() string {
-	template := dbkeyFuncString_str
+	template := dbkeyFuncStringStr
 	template = strings.Replace(template, "{{classname}}", className, -1)
 	template = strings.Replace(template, "{{key_type}}", keyType, -1)
 	return template
@@ -315,7 +315,7 @@ func toUpper(s string) string {
 
 func sortFields() []string {
 	var ret []string
-	for k, _ := range fields {
+	for k := range fields {
 		ret = append(ret, k)
 	}
 	sort.Strings(ret)

@@ -189,8 +189,7 @@ func (this *{{classname}}) Expire(v uint) {
 }
 `
 
-const convSubKeyFuncString_int = `tempUint64, err := strconv.ParseUint(temp, 10, 64)
+const convSubKeyFuncStringInt = `tempUint64, err := strconv.ParseUint(temp, 10, 64)
 subKey := {{sub_key_type}}(tempUint64)`
 
-const convSubKeyFuncString_str = `subKey := temp`
-
+const convSubKeyFuncStringStr = `subKey := temp`

@@ -155,12 +155,12 @@ const setFuncString = `func (this *{{classname}}) Set{{field_name_upper}}(value 
 	this.__dirtyData["{{field_name_lower_all}}"] = value
 }`
 
-const setFuncString_fieldstring = `func (this *{{classname}}) Set{{field_name_upper}}(value {{field_type}}) {
+const setFuncStringFieldstring = `func (this *{{classname}}) Set{{field_name_upper}}(value {{field_type}}) {
 	this.{{field_name_lower}} = value
 	this.__dirtyData["{{field_name_lower_all}}"] = string([]byte(value))
 }`
 
-const setFuncString_fieldbyte = `func (this *{{classname}}) Set{{field_name_upper}}(value {{field_type}}) {
+const setFuncStringFieldbyte = `func (this *{{classname}}) Set{{field_name_upper}}(value {{field_type}}) {
 	this.{{field_name_lower}} = value
 	var tmp []byte = make([]byte, len(value))
 	copy(tmp, value)
@@ -190,6 +190,6 @@ const getFuncStringSave2 = `if k == "{{field_name_lower_all}}" {
 	this.__dirtyData["{{field_name_lower_all}}"] = data
 }`
 
-const dbkeyFuncString_int = `"{{classname}}:" + fmt.Sprintf("%d", key)`
+const dbkeyFuncStringInt = `"{{classname}}:" + fmt.Sprintf("%d", key)`
 
-const dbkeyFuncString_str = `"{{classname}}:" + key`
+const dbkeyFuncStringStr = `"{{classname}}:" + key`

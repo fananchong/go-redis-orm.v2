@@ -41,15 +41,15 @@ func doType1n() error {
 	if err != nil {
 		return err
 	}
-	err = exec_gofmt(outpath)
+	err = execGoFmt(outpath)
 	if err != nil {
 		return err
 	}
 
-	// template1n_subitem
-	template = template1n_subitem
+	// template1nSubitem
+	template = template1nSubitem
 	if format == "protobuf" || format == "gogo" {
-		template = template1n_subitem2
+		template = template1nSubitem2
 	}
 	template = strings.Replace(template, "{{packagename}}", *packageName, -1)
 	template = strings.Replace(template, "{{classname}}", className, -1)
@@ -84,22 +84,22 @@ func doType1n() error {
 	if err != nil {
 		return err
 	}
-	return exec_gofmt(outpath)
+	return execGoFmt(outpath)
 }
 
 func getConvSubKey() string {
 	var template = ""
 	if strings.Contains(subKeyType, "int") {
-		template = convSubKeyFuncString_int
+		template = convSubKeyFuncStringInt
 		template = strings.Replace(template, "{{sub_key_type}}", subKeyType, -1)
 	} else if subKeyType == "string" {
-		template = convSubKeyFuncString_str
+		template = convSubKeyFuncStringStr
 	}
 	return template
 }
 
 func getFuncGet1n() string {
-	var ret string = ""
+	var ret string
 	for _, k := range sortFields() {
 		v := fields[k].(string)
 		template := get1nFuncString
@@ -117,7 +117,7 @@ func getFuncGet1n() string {
 }
 
 func getFuncSet1n() string {
-	var ret string = ""
+	var ret string
 	for _, k := range sortFields() {
 		v := fields[k].(string)
 		if isBaseType(v) == false {
