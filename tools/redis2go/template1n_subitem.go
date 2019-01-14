@@ -10,20 +10,23 @@ import (
 	{{import_struct_format}}
 )
 
+// {{classname}}ItemData : 子对象所有字段
 type {{classname}}ItemData struct {
 	{{fields_def}}
 }
 
+// {{classname}}Item : 代表 1 个 redis 子对象
 type {{classname}}Item struct {
 	SubKey {{sub_key_type}}
-	__data {{classname}}ItemData
-	__root *{{classname}}
+	dataIn{{classname}}Item {{classname}}ItemData
+	rootIn{{classname}}Item *{{classname}}
 }
 
+// New{{classname}}Item : New{{classname}}Item 的构造函数
 func New{{classname}}Item(subKey {{sub_key_type}}, root *{{classname}}) *{{classname}}Item {
 	return &{{classname}}Item{
 		SubKey: subKey,
-		__root: root,
+		rootIn{{classname}}Item: root,
 	}
 }
 
@@ -31,15 +34,17 @@ func New{{classname}}Item(subKey {{sub_key_type}}, root *{{classname}}) *{{class
 
 {{func_set1n}}
 
-func (this *{{classname}}Item) Unmarshal(data []byte) error {
-	if err := {{struct_format}}.Unmarshal(data, &this.__data); err != nil {
+// Unmarshal : 反序列化方法
+func (obj{{classname}}Item *{{classname}}Item) Unmarshal(data []byte) error {
+	if err := {{struct_format}}.Unmarshal(data, &obj{{classname}}Item.dataIn{{classname}}Item); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (this *{{classname}}Item) Marshal() ([]byte, error) {
-	data, err := {{struct_format}}.Marshal(&this.__data)
+// Marshal : 序列化方法
+func (obj{{classname}}Item *{{classname}}Item) Marshal() ([]byte, error) {
+	data, err := {{struct_format}}.Marshal(&obj{{classname}}Item.dataIn{{classname}}Item)
 	if err != nil {
 		return nil, err
 	}
@@ -47,18 +52,21 @@ func (this *{{classname}}Item) Marshal() ([]byte, error) {
 }
 `
 
-const get1nFuncString = `func (this *{{classname}}Item) Get{{field_name_upper}}() {{field_type}} {
-	return this.__data.{{field_name_upper}}
+const get1nFuncString = `// Get{{field_name_upper}} : 获取字段值
+func (obj{{classname}}Item *{{classname}}Item) Get{{field_name_upper}}() {{field_type}} {
+	return obj{{classname}}Item.dataIn{{classname}}Item.{{field_name_upper}}
 }`
 
-const set1nFuncString = `func (this *{{classname}}Item) Set{{field_name_upper}}(value {{field_type}}) {
-	this.__data.{{field_name_upper}} = value
-	this.__root.__dirtyData[this.SubKey] = 1
+const set1nFuncString = `// Set{{field_name_upper}} : 设置字段值
+func (obj{{classname}}Item *{{classname}}Item) Set{{field_name_upper}}(value {{field_type}}) {
+	obj{{classname}}Item.dataIn{{classname}}Item.{{field_name_upper}} = value
+	obj{{classname}}Item.rootIn{{classname}}Item.dirtyDataIn{{classname}}[obj{{classname}}Item.SubKey] = 1
 }`
 
-const get1nFuncStringForStructFiled = `func (this *{{classname}}Item) Get{{field_name_upper}}(mutable bool) *{{field_type}} {
+const get1nFuncStringForStructFiled = `// Get{{field_name_upper}} : 获取字段值
+func (obj{{classname}}Item *{{classname}}Item) Get{{field_name_upper}}(mutable bool) *{{field_type}} {
 	if mutable {
-		this.__root.__dirtyData[this.SubKey] = 1
+		obj{{classname}}Item.rootIn{{classname}}Item.dirtyDataIn{{classname}}[obj{{classname}}Item.SubKey] = 1
 	}
-	return &this.__data.{{field_name_upper}}
+	return &obj{{classname}}Item.dataIn{{classname}}Item.{{field_name_upper}}
 }`

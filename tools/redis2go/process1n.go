@@ -52,12 +52,12 @@ func doType1n() error {
 		template = template1nSubitem2
 	}
 	template = strings.Replace(template, "{{packagename}}", *packageName, -1)
-	template = strings.Replace(template, "{{classname}}", className, -1)
 	template = strings.Replace(template, "{{sub_key_type}}", subKeyType, -1)
 	template = strings.Replace(template, "{{sub_item_type}}", subItemType, -1)
 	template = strings.Replace(template, "{{fields_def}}", getFieldsDef(true), -1)
 	template = strings.Replace(template, "{{func_get1n}}", getFuncGet1n(), -1)
 	template = strings.Replace(template, "{{func_set1n}}", getFuncSet1n(), -1)
+	template = strings.Replace(template, "{{classname}}", className, -1)
 
 	if format == "cstruct-go" {
 		template = strings.Replace(template, "{{import_struct_format}}", "cstruct \"github.com/fananchong/cstruct-go\"", -1)

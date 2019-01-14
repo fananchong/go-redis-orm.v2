@@ -77,7 +77,6 @@ func doFile(js *simplejson.Json) error {
 func doType11() error {
 	template := template11
 	template = strings.Replace(template, "{{packagename}}", *packageName, -1)
-	template = strings.Replace(template, "{{classname}}", className, -1)
 	template = strings.Replace(template, "{{key_type}}", keyType, -1)
 	template = strings.Replace(template, "{{fields_def}}", getFieldsDef(false), -1)
 	template = strings.Replace(template, "{{fields_def_db}}", getFieldsDefDB(), -1)
@@ -86,6 +85,7 @@ func doType11() error {
 	template = strings.Replace(template, "{{func_set}}", getFuncSet(), -1)
 	template = strings.Replace(template, "{{fields_save}}", getFuncSave(getFuncStringSave), -1)
 	template = strings.Replace(template, "{{fields_save2}}", getFuncSave(getFuncStringSave2), -1)
+	template = strings.Replace(template, "{{classname}}", className, -1)
 
 	if hasStructField() {
 		if format == "cstruct-go" {
@@ -221,11 +221,11 @@ func getFieldsInit() string {
 		}
 		v := fields[k].(string)
 		if isBaseType(v) == false {
-			ret = ret + "if err := {{struct_format}}.Unmarshal(data." + toUpper(k) + ", &" + "this." + toLower(k) + "); err != nil {\n"
+			ret = ret + "if err := {{struct_format}}.Unmarshal(data." + toUpper(k) + ", &" + "obj{{classname}}." + toLower(k) + "); err != nil {\n"
 			ret = ret + "return err\n"
 			ret = ret + "}\n"
 		} else {
-			ret = ret + "this." + toLower(k) + " = data." + toUpper(k)
+			ret = ret + "obj{{classname}}." + toLower(k) + " = data." + toUpper(k)
 		}
 	}
 	return ret

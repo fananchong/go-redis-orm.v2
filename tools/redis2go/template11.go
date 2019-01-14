@@ -15,45 +15,48 @@ import (
 	"github.com/gomodule/redigo/redis"
 )
 
-
+// {{classname}} : 代表 1 个 redis 对象
 type {{classname}} struct {
 	Key {{key_type}}
 	{{fields_def}}
 
-	__dirtyData map[string]interface{}
-	__dirtyDataForStructFiled map[string]interface{}
-	__isLoad bool
-	__dbKey string
-	__dbName string
-	__expire uint
+	dirtyDataIn{{classname}} map[string]interface{}
+	dirtyDataForStructFiledIn{{classname}} map[string]interface{}
+	isLoadIn{{classname}} bool
+	dbKeyIn{{classname}} string
+	ddbNameIn{{classname}} string
+	expireIn{{classname}} uint
 }
 
+// New{{classname}} : New{{classname}} 的构造函数
 func New{{classname}}(dbName string, key {{key_type}}) *{{classname}} {
 	return &{{classname}} {
 		Key: key,
-		__dbName: dbName,
-		__dbKey: {{func_dbkey}},
-		__dirtyData: make(map[string]interface{}),
-		__dirtyDataForStructFiled: make(map[string]interface{}),
+		ddbNameIn{{classname}}: dbName,
+		dbKeyIn{{classname}}: {{func_dbkey}},
+		dirtyDataIn{{classname}}: make(map[string]interface{}),
+		dirtyDataForStructFiledIn{{classname}}: make(map[string]interface{}),
 	}
 }
 
-// 若访问数据库失败返回-1；若 key 存在返回 1 ，否则返回 0 。
-func (this *{{classname}}) HasKey() (int, error) {
-	db := go_redis_orm.GetDB(this.__dbName)
-	val, err := redis.Int(db.Do("EXISTS", this.__dbKey))
+// HasKey : 是否存在 KEY
+//          返回值，若访问数据库失败返回-1；若 key 存在返回 1 ，否则返回 0 。
+func (obj{{classname}} *{{classname}}) HasKey() (int, error) {
+	db := go_redis_orm.GetDB(obj{{classname}}.ddbNameIn{{classname}})
+	val, err := redis.Int(db.Do("EXISTS", obj{{classname}}.dbKeyIn{{classname}}))
 	if err != nil {
 		return -1, err
 	}
 	return val, nil
 }
 
-func (this *{{classname}}) Load() error {
-	if this.__isLoad == true {
-		return errors.New("alreay load!")
+// Load : 从 redis 加载数据
+func (obj{{classname}} *{{classname}}) Load() error {
+	if obj{{classname}}.isLoadIn{{classname}} == true {
+		return errors.New("alreay load")
 	}
-	db := go_redis_orm.GetDB(this.__dbName)
-	val, err := redis.Values(db.Do("HGETALL", this.__dbKey))
+	db := go_redis_orm.GetDB(obj{{classname}}.ddbNameIn{{classname}})
+	val, err := redis.Values(db.Do("HGETALL", obj{{classname}}.dbKeyIn{{classname}}))
 	if err != nil {
 		return err
 	}
@@ -67,75 +70,81 @@ func (this *{{classname}}) Load() error {
 		return err
 	}
 	{{fields_init}}
-	this.__isLoad = true
+	obj{{classname}}.isLoadIn{{classname}} = true
 	return nil
 }
 
-func (this *{{classname}}) Save() error {
-	if len(this.__dirtyData) == 0 && len(this.__dirtyDataForStructFiled) == 0 {
+// Save : 保存数据到 redis
+func (obj{{classname}} *{{classname}}) Save() error {
+	if len(obj{{classname}}.dirtyDataIn{{classname}}) == 0 && len(obj{{classname}}.dirtyDataForStructFiledIn{{classname}}) == 0 {
 		return nil
 	}
-	for k,_ := range(this.__dirtyDataForStructFiled) {
+	for k := range(obj{{classname}}.dirtyDataForStructFiledIn{{classname}}) {
 		_ = k
 		{{fields_save}}
 	}
-	db := go_redis_orm.GetDB(this.__dbName)
-	if _, err := db.Do("HMSET", redis.Args{}.Add(this.__dbKey).AddFlat(this.__dirtyData)...); err != nil {
+	db := go_redis_orm.GetDB(obj{{classname}}.ddbNameIn{{classname}})
+	if _, err := db.Do("HMSET", redis.Args{}.Add(obj{{classname}}.dbKeyIn{{classname}}).AddFlat(obj{{classname}}.dirtyDataIn{{classname}})...); err != nil {
 		return err
 	}
-	if this.__expire != 0 {
-		if _, err := db.Do("EXPIRE", this.__dbKey, this.__expire); err != nil {
+	if obj{{classname}}.expireIn{{classname}} != 0 {
+		if _, err := db.Do("EXPIRE", obj{{classname}}.dbKeyIn{{classname}}, obj{{classname}}.expireIn{{classname}}); err != nil {
 			return err
 		}
 	}
-	this.__dirtyData = make(map[string]interface{})
-	this.__dirtyDataForStructFiled = make(map[string]interface{})
+	obj{{classname}}.dirtyDataIn{{classname}} = make(map[string]interface{})
+	obj{{classname}}.dirtyDataForStructFiledIn{{classname}} = make(map[string]interface{})
 	return nil
 }
 
-func (this *{{classname}}) Delete() error {
-	db := go_redis_orm.GetDB(this.__dbName)
-	_, err := db.Do("DEL", this.__dbKey)
+// Delete : 从 redis 删除数据
+func (obj{{classname}} *{{classname}}) Delete() error {
+	db := go_redis_orm.GetDB(obj{{classname}}.ddbNameIn{{classname}})
+	_, err := db.Do("DEL", obj{{classname}}.dbKeyIn{{classname}})
 	if err == nil {
-		this.__isLoad = false
-		this.__dirtyData = make(map[string]interface{})
-		this.__dirtyDataForStructFiled = make(map[string]interface{})
+		obj{{classname}}.isLoadIn{{classname}} = false
+		obj{{classname}}.dirtyDataIn{{classname}} = make(map[string]interface{})
+		obj{{classname}}.dirtyDataForStructFiledIn{{classname}} = make(map[string]interface{})
 	}
 	return err
 }
 
-func (this *{{classname}}) IsLoad() bool {
-	return this.__isLoad
+// IsLoad : 是否已经从 redis 导入数据
+func (obj{{classname}} *{{classname}}) IsLoad() bool {
+	return obj{{classname}}.isLoadIn{{classname}}
 }
 
-func (this *{{classname}}) Expire(v uint) {
-	this.__expire = v
+// Expire : 向 redis 设置该对象过期时间
+func (obj{{classname}} *{{classname}}) Expire(v uint) {
+	obj{{classname}}.expireIn{{classname}} = v
 }
 
-func (this *{{classname}}) DirtyData() (map[string]interface{}, error) {
-	for k,_ := range(this.__dirtyDataForStructFiled) {
+// DirtyData : 获取该对象目前已脏的数据
+func (obj{{classname}} *{{classname}}) DirtyData() (map[string]interface{}, error) {
+	for k := range(obj{{classname}}.dirtyDataForStructFiledIn{{classname}}) {
 		_ = k
 		{{fields_save2}}
 	}
 	data := make(map[string]interface{})
-	for k, v := range(this.__dirtyData) {
+	for k, v := range(obj{{classname}}.dirtyDataIn{{classname}}) {
 		data[k] = v
 	}
-	this.__dirtyData = make(map[string]interface{})
-	this.__dirtyDataForStructFiled = make(map[string]interface{})
+	obj{{classname}}.dirtyDataIn{{classname}} = make(map[string]interface{})
+	obj{{classname}}.dirtyDataForStructFiledIn{{classname}} = make(map[string]interface{})
 	return data, nil
 }
 
-func (this *{{classname}}) Save2(dirtyData map[string]interface{}) error {
+// Save2 : 保存数据到 redis 的第 2 种方法
+func (obj{{classname}} *{{classname}}) Save2(dirtyData map[string]interface{}) error {
 	if len(dirtyData) == 0 {
 		return nil
 	}
-	db := go_redis_orm.GetDB(this.__dbName)
-	if _, err := db.Do("HMSET", redis.Args{}.Add(this.__dbKey).AddFlat(dirtyData)...); err != nil {
+	db := go_redis_orm.GetDB(obj{{classname}}.ddbNameIn{{classname}})
+	if _, err := db.Do("HMSET", redis.Args{}.Add(obj{{classname}}.dbKeyIn{{classname}}).AddFlat(dirtyData)...); err != nil {
 		return err
 	}
-	if this.__expire != 0 {
-		if _, err := db.Do("EXPIRE", this.__dbKey, this.__expire); err != nil {
+	if obj{{classname}}.expireIn{{classname}} != 0 {
+		if _, err := db.Do("EXPIRE", obj{{classname}}.dbKeyIn{{classname}}, obj{{classname}}.expireIn{{classname}}); err != nil {
 			return err
 		}
 	}
@@ -146,48 +155,53 @@ func (this *{{classname}}) Save2(dirtyData map[string]interface{}) error {
 
 {{func_set}}`
 
-const getFuncString = `func (this *{{classname}}) Get{{field_name_upper}}() {{field_type}} {
-	return this.{{field_name_lower}}
+const getFuncString = `// Get{{field_name_upper}} : 获取字段值
+func (obj{{classname}} *{{classname}}) Get{{field_name_upper}}() {{field_type}} {
+	return obj{{classname}}.{{field_name_lower}}
 }`
 
-const setFuncString = `func (this *{{classname}}) Set{{field_name_upper}}(value {{field_type}}) {
-	this.{{field_name_lower}} = value
-	this.__dirtyData["{{field_name_lower_all}}"] = value
+const setFuncString = `// Set{{field_name_upper}} : 设置字段值
+func (obj{{classname}} *{{classname}}) Set{{field_name_upper}}(value {{field_type}}) {
+	obj{{classname}}.{{field_name_lower}} = value
+	obj{{classname}}.dirtyDataIn{{classname}}["{{field_name_lower_all}}"] = value
 }`
 
-const setFuncStringFieldstring = `func (this *{{classname}}) Set{{field_name_upper}}(value {{field_type}}) {
-	this.{{field_name_lower}} = value
-	this.__dirtyData["{{field_name_lower_all}}"] = string([]byte(value))
+const setFuncStringFieldstring = `// Set{{field_name_upper}} : 设置字段值
+func (obj{{classname}} *{{classname}}) Set{{field_name_upper}}(value {{field_type}}) {
+	obj{{classname}}.{{field_name_lower}} = value
+	obj{{classname}}.dirtyDataIn{{classname}}["{{field_name_lower_all}}"] = string([]byte(value))
 }`
 
-const setFuncStringFieldbyte = `func (this *{{classname}}) Set{{field_name_upper}}(value {{field_type}}) {
-	this.{{field_name_lower}} = value
-	var tmp []byte = make([]byte, len(value))
+const setFuncStringFieldbyte = `// Set{{field_name_upper}} : 设置字段值
+func (obj{{classname}} *{{classname}}) Set{{field_name_upper}}(value {{field_type}}) {
+	obj{{classname}}.{{field_name_lower}} = value
+	tmp := make([]byte, len(value))
 	copy(tmp, value)
-	this.__dirtyData["{{field_name_lower_all}}"] = tmp
+	obj{{classname}}.dirtyDataIn{{classname}}["{{field_name_lower_all}}"] = tmp
 }`
 
-const getFuncStringForStructFiled = `func (this *{{classname}}) Get{{field_name_upper}}(mutable bool) *{{field_type}} {
+const getFuncStringForStructFiled = `// Get{{field_name_upper}} : 获取字段值
+func (obj{{classname}} *{{classname}}) Get{{field_name_upper}}(mutable bool) *{{field_type}} {
 	if mutable {
-		this.__dirtyDataForStructFiled["{{field_name_lower_all}}"] = nil
+		obj{{classname}}.dirtyDataForStructFiledIn{{classname}}["{{field_name_lower_all}}"] = nil
 	}
-	return &this.{{field_name_lower}}
+	return &obj{{classname}}.{{field_name_lower}}
 }`
 
 const getFuncStringSave = `if k == "{{field_name_lower_all}}" {
-	data, err := {{struct_format}}.Marshal(&this.{{field_name_lower}})
+	data, err := {{struct_format}}.Marshal(&obj{{classname}}.{{field_name_lower}})
 	if err != nil {
 		return err
 	}
-	this.__dirtyData["{{field_name_lower_all}}"] = data
+	obj{{classname}}.dirtyDataIn{{classname}}["{{field_name_lower_all}}"] = data
 }`
 
 const getFuncStringSave2 = `if k == "{{field_name_lower_all}}" {
-	data, err := {{struct_format}}.Marshal(&this.{{field_name_lower}})
+	data, err := {{struct_format}}.Marshal(&obj{{classname}}.{{field_name_lower}})
 	if err != nil {
 		return nil, err
 	}
-	this.__dirtyData["{{field_name_lower_all}}"] = data
+	obj{{classname}}.dirtyDataIn{{classname}}["{{field_name_lower_all}}"] = data
 }`
 
 const dbkeyFuncStringInt = `"{{classname}}:" + fmt.Sprintf("%d", key)`

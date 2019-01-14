@@ -10,36 +10,40 @@ import (
 	{{import_struct_format}}
 )
 
+// {{classname}}Item : 代表 1 个 redis 子对象
 type {{classname}}Item struct {
 	SubKey {{sub_key_type}}
-	__data {{sub_item_type}}
-	__root *{{classname}}
+	dataIn{{classname}}Item {{sub_item_type}}
+	rootIn{{classname}}Item *{{classname}}
 }
 
+// New{{classname}}Item : New{{classname}}Item 的构造函数
 func New{{classname}}Item(subKey {{sub_key_type}}, root *{{classname}}) *{{classname}}Item {
 	return &{{classname}}Item{
 		SubKey: subKey,
-		__root: root,
+		rootIn{{classname}}Item: root,
 	}
 }
 
-func (this *{{classname}}Item) Get(mutable bool) *{{sub_item_type}}{
+// Get : 获取字段值
+func (obj{{classname}}Item *{{classname}}Item) Get(mutable bool) *{{sub_item_type}}{
 	if mutable {
-		this.__root.__dirtyData[this.SubKey] = 1
+		obj{{classname}}Item.rootIn{{classname}}Item.dirtyDataIn{{classname}}[obj{{classname}}Item.SubKey] = 1
 	}
-	return &this.__data
+	return &obj{{classname}}Item.dataIn{{classname}}Item
 }
 
-
-func (this *{{classname}}Item) Unmarshal(data []byte) error {
-	if err := {{struct_format}}.Unmarshal(data, &this.__data); err != nil {
+// Unmarshal : 反序列化方法
+func (obj{{classname}}Item *{{classname}}Item) Unmarshal(data []byte) error {
+	if err := {{struct_format}}.Unmarshal(data, &obj{{classname}}Item.dataIn{{classname}}Item); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (this *{{classname}}Item) Marshal() ([]byte, error) {
-	data, err := {{struct_format}}.Marshal(&this.__data)
+// Marshal : 序列化方法
+func (obj{{classname}}Item *{{classname}}Item) Marshal() ([]byte, error) {
+	data, err := {{struct_format}}.Marshal(&obj{{classname}}Item.dataIn{{classname}}Item)
 	if err != nil {
 		return nil, err
 	}
